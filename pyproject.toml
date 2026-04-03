@@ -8,7 +8,7 @@ version = "0.6.0"
 description = "Caesar Agent — the AI agent that conquers your workflow"
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [{ name = "Sebastian Sartele", email = "github@Sebastians007" }]
+authors = [{ name = "Sebastian Sartele", email = "sebastian@caesar-agent.local" }]
 license = { text = "MIT" }
 dependencies = [
   # Core — pinned to known-good ranges to limit supply chain attack surface
