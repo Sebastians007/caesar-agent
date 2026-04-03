@@ -1,6 +1,6 @@
-"""CLI entry point for the hermes-agent ACP adapter.
+"""CLI entry point for the caesar-agent ACP adapter.
 
-Loads environment variables from ``~/.hermes/.env``, configures logging
+Loads environment variables from ``~/.caesar/.env``, configures logging
 to write to stderr (so stdout is reserved for ACP JSON-RPC transport),
 and starts the ACP agent server.
 
@@ -8,9 +8,9 @@ Usage::
 
     python -m acp_adapter.entry
     # or
-    hermes acp
+    caesar acp
     # or
-    hermes-acp
+    caesar-acp
 """
 
 import asyncio
@@ -18,7 +18,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from hermes_constants import get_hermes_home
+from caesar_constants import get_caesar_home
 
 
 def _setup_logging() -> None:
@@ -42,17 +42,17 @@ def _setup_logging() -> None:
 
 
 def _load_env() -> None:
-    """Load .env from HERMES_HOME (default ``~/.hermes``)."""
-    from hermes_cli.env_loader import load_hermes_dotenv
+    """Load .env from CAESAR_HOME (default ``~/.caesar``)."""
+    from caesar_cli.env_loader import load_caesar_dotenv
 
-    hermes_home = get_hermes_home()
-    loaded = load_hermes_dotenv(hermes_home=hermes_home)
+    caesar_home = get_caesar_home()
+    loaded = load_caesar_dotenv(caesar_home=caesar_home)
     if loaded:
         for env_file in loaded:
             logging.getLogger(__name__).info("Loaded env from %s", env_file)
     else:
         logging.getLogger(__name__).info(
-            "No .env found at %s, using system env", hermes_home / ".env"
+            "No .env found at %s, using system env", caesar_home / ".env"
         )
 
 
@@ -62,7 +62,7 @@ def main() -> None:
     _load_env()
 
     logger = logging.getLogger(__name__)
-    logger.info("Starting hermes-agent ACP adapter")
+    logger.info("Starting caesar-agent ACP adapter")
 
     # Ensure the project root is on sys.path so ``from run_agent import AIAgent`` works
     project_root = str(Path(__file__).resolve().parent.parent)
@@ -70,9 +70,9 @@ def main() -> None:
         sys.path.insert(0, project_root)
 
     import acp
-    from .server import HermesACPAgent
+    from .server import CaesarACPAgent
 
-    agent = HermesACPAgent()
+    agent = CaesarACPAgent()
     try:
         asyncio.run(acp.run_agent(agent, use_unstable_protocol=True))
     except KeyboardInterrupt:

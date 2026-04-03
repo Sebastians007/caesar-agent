@@ -1,24 +1,24 @@
 ---
 sidebar_position: 7
 title: "Migrate from OpenClaw"
-description: "Complete guide to migrating your OpenClaw / Clawdbot setup to Hermes Agent — what gets migrated, how config maps, and what to check after."
+description: "Complete guide to migrating your OpenClaw / Clawdbot setup to Caesar Agent — what gets migrated, how config maps, and what to check after."
 ---
 
 # Migrate from OpenClaw
 
-`hermes claw migrate` imports your OpenClaw (or legacy Clawdbot/Moldbot) setup into Hermes. This guide covers exactly what gets migrated, the config key mappings, and what to verify after migration.
+`caesar claw migrate` imports your OpenClaw (or legacy Clawdbot/Moldbot) setup into Caesar. This guide covers exactly what gets migrated, the config key mappings, and what to verify after migration.
 
 ## Quick start
 
 ```bash
 # Preview what would happen (no files changed)
-hermes claw migrate --dry-run
+caesar claw migrate --dry-run
 
 # Run the migration (secrets excluded by default)
-hermes claw migrate
+caesar claw migrate
 
 # Full migration including API keys
-hermes claw migrate --preset full
+caesar claw migrate --preset full
 ```
 
 The migration reads from `~/.openclaw/` by default. If you still have a legacy `~/.clawdbot/` or `~/.moldbot/` directory, it's detected automatically. Same for legacy config filenames (`clawdbot.json`, `moldbot.json`).
@@ -29,7 +29,7 @@ The migration reads from `~/.openclaw/` by default. If you still have a legacy `
 |--------|-------------|
 | `--dry-run` | Preview what would be migrated without writing anything. |
 | `--preset <name>` | `full` (default, includes secrets) or `user-data` (excludes API keys). |
-| `--overwrite` | Overwrite existing Hermes files on conflicts (default: skip). |
+| `--overwrite` | Overwrite existing Caesar files on conflicts (default: skip). |
 | `--migrate-secrets` | Include API keys (on by default with `--preset full`). |
 | `--source <path>` | Custom OpenClaw directory. |
 | `--workspace-target <path>` | Where to place `AGENTS.md`. |
@@ -40,38 +40,38 @@ The migration reads from `~/.openclaw/` by default. If you still have a legacy `
 
 ### Persona, memory, and instructions
 
-| What | OpenClaw source | Hermes destination | Notes |
+| What | OpenClaw source | Caesar destination | Notes |
 |------|----------------|-------------------|-------|
-| Persona | `workspace/SOUL.md` | `~/.hermes/SOUL.md` | Direct copy |
+| Persona | `workspace/SOUL.md` | `~/.caesar/SOUL.md` | Direct copy |
 | Workspace instructions | `workspace/AGENTS.md` | `AGENTS.md` in `--workspace-target` | Requires `--workspace-target` flag |
-| Long-term memory | `workspace/MEMORY.md` | `~/.hermes/memories/MEMORY.md` | Parsed into entries, merged with existing, deduped. Uses `§` delimiter. |
-| User profile | `workspace/USER.md` | `~/.hermes/memories/USER.md` | Same entry-merge logic as memory. |
-| Daily memory files | `workspace/memory/*.md` | `~/.hermes/memories/MEMORY.md` | All daily files merged into main memory. |
+| Long-term memory | `workspace/MEMORY.md` | `~/.caesar/memories/MEMORY.md` | Parsed into entries, merged with existing, deduped. Uses `§` delimiter. |
+| User profile | `workspace/USER.md` | `~/.caesar/memories/USER.md` | Same entry-merge logic as memory. |
+| Daily memory files | `workspace/memory/*.md` | `~/.caesar/memories/MEMORY.md` | All daily files merged into main memory. |
 
 All workspace files also check `workspace.default/` as a fallback path.
 
 ### Skills (4 sources)
 
-| Source | OpenClaw location | Hermes destination |
+| Source | OpenClaw location | Caesar destination |
 |--------|------------------|-------------------|
-| Workspace skills | `workspace/skills/` | `~/.hermes/skills/openclaw-imports/` |
-| Managed/shared skills | `~/.openclaw/skills/` | `~/.hermes/skills/openclaw-imports/` |
-| Personal cross-project | `~/.agents/skills/` | `~/.hermes/skills/openclaw-imports/` |
-| Project-level shared | `workspace/.agents/skills/` | `~/.hermes/skills/openclaw-imports/` |
+| Workspace skills | `workspace/skills/` | `~/.caesar/skills/openclaw-imports/` |
+| Managed/shared skills | `~/.openclaw/skills/` | `~/.caesar/skills/openclaw-imports/` |
+| Personal cross-project | `~/.agents/skills/` | `~/.caesar/skills/openclaw-imports/` |
+| Project-level shared | `workspace/.agents/skills/` | `~/.caesar/skills/openclaw-imports/` |
 
-Skill conflicts are handled by `--skill-conflict`: `skip` leaves the existing Hermes skill, `overwrite` replaces it, `rename` creates a `-imported` copy.
+Skill conflicts are handled by `--skill-conflict`: `skip` leaves the existing Caesar skill, `overwrite` replaces it, `rename` creates a `-imported` copy.
 
 ### Model and provider configuration
 
-| What | OpenClaw config path | Hermes destination | Notes |
+| What | OpenClaw config path | Caesar destination | Notes |
 |------|---------------------|-------------------|-------|
 | Default model | `agents.defaults.model` | `config.yaml` → `model` | Can be a string or `{primary, fallbacks}` object |
 | Custom providers | `models.providers.*` | `config.yaml` → `custom_providers` | Maps `baseUrl`, `apiType` ("openai"→"chat_completions", "anthropic"→"anthropic_messages") |
-| Provider API keys | `models.providers.*.apiKey` | `~/.hermes/.env` | Requires `--migrate-secrets`. See [API key resolution](#api-key-resolution) below. |
+| Provider API keys | `models.providers.*.apiKey` | `~/.caesar/.env` | Requires `--migrate-secrets`. See [API key resolution](#api-key-resolution) below. |
 
 ### Agent behavior
 
-| What | OpenClaw config path | Hermes config path | Mapping |
+| What | OpenClaw config path | Caesar config path | Mapping |
 |------|---------------------|-------------------|---------|
 | Max turns | `agents.defaults.timeoutSeconds` | `agent.max_turns` | `timeoutSeconds / 10`, capped at 200 |
 | Verbose mode | `agents.defaults.verboseDefault` | `agent.verbose` | "off" / "on" / "full" |
@@ -87,7 +87,7 @@ Skill conflicts are handled by `--skill-conflict`: `skip` leaves the existing He
 
 ### Session reset policies
 
-| OpenClaw config path | Hermes config path | Notes |
+| OpenClaw config path | Caesar config path | Notes |
 |---------------------|-------------------|-------|
 | `session.reset.mode` | `session_reset.mode` | "daily", "idle", or both |
 | `session.reset.atHour` | `session_reset.at_hour` | Hour (0–23) for daily reset |
@@ -97,7 +97,7 @@ Note: OpenClaw also has `session.resetTriggers` (a simple string array like `["d
 
 ### MCP servers
 
-| OpenClaw field | Hermes field | Notes |
+| OpenClaw field | Caesar field | Notes |
 |----------------|-------------|-------|
 | `mcp.servers.*.command` | `mcp_servers.*.command` | Stdio transport |
 | `mcp.servers.*.args` | `mcp_servers.*.args` | |
@@ -115,7 +115,7 @@ TTS settings are read from **two** OpenClaw config locations with this priority:
 2. Top-level `talk.providers.{provider}.*` (fallback)
 3. Legacy flat keys `messages.tts.{provider}.*` (oldest format)
 
-| What | Hermes destination |
+| What | Caesar destination |
 |------|-------------------|
 | Provider name | `config.yaml` → `tts.provider` |
 | ElevenLabs voice ID | `config.yaml` → `tts.elevenlabs.voice_id` |
@@ -123,11 +123,11 @@ TTS settings are read from **two** OpenClaw config locations with this priority:
 | OpenAI model | `config.yaml` → `tts.openai.model` |
 | OpenAI voice | `config.yaml` → `tts.openai.voice` |
 | Edge TTS voice | `config.yaml` → `tts.edge.voice` |
-| TTS assets | `~/.hermes/tts/` (file copy) |
+| TTS assets | `~/.caesar/tts/` (file copy) |
 
 ### Messaging platforms
 
-| Platform | OpenClaw config path | Hermes `.env` variable | Notes |
+| Platform | OpenClaw config path | Caesar `.env` variable | Notes |
 |----------|---------------------|----------------------|-------|
 | Telegram | `channels.telegram.botToken` | `TELEGRAM_BOT_TOKEN` | Token can be string or [SecretRef](#secretref-handling) |
 | Telegram | `credentials/telegram-default-allowFrom.json` | `TELEGRAM_ALLOWED_USERS` | Comma-joined from `allowFrom[]` array |
@@ -145,34 +145,34 @@ TTS settings are read from **two** OpenClaw config locations with this priority:
 
 ### Other config
 
-| What | OpenClaw path | Hermes path | Notes |
+| What | OpenClaw path | Caesar path | Notes |
 |------|-------------|-------------|-------|
 | Approval mode | `approvals.exec.mode` | `config.yaml` → `approvals.mode` | "auto"→"off", "always"→"manual", "smart"→"smart" |
 | Command allowlist | `exec-approvals.json` | `config.yaml` → `command_allowlist` | Patterns merged and deduped |
 | Browser CDP URL | `browser.cdpUrl` | `config.yaml` → `browser.cdp_url` | |
 | Browser headless | `browser.headless` | `config.yaml` → `browser.headless` | |
 | Brave search key | `tools.web.search.brave.apiKey` | `.env` → `BRAVE_API_KEY` | Requires `--migrate-secrets` |
-| Gateway auth token | `gateway.auth.token` | `.env` → `HERMES_GATEWAY_TOKEN` | Requires `--migrate-secrets` |
+| Gateway auth token | `gateway.auth.token` | `.env` → `CAESAR_GATEWAY_TOKEN` | Requires `--migrate-secrets` |
 | Working directory | `agents.defaults.workspace` | `.env` → `MESSAGING_CWD` | |
 
-### Archived (no direct Hermes equivalent)
+### Archived (no direct Caesar equivalent)
 
-These are saved to `~/.hermes/migration/openclaw/<timestamp>/archive/` for manual review:
+These are saved to `~/.caesar/migration/openclaw/<timestamp>/archive/` for manual review:
 
-| What | Archive file | How to recreate in Hermes |
+| What | Archive file | How to recreate in Caesar |
 |------|-------------|--------------------------|
 | `IDENTITY.md` | `archive/workspace/IDENTITY.md` | Merge into `SOUL.md` |
-| `TOOLS.md` | `archive/workspace/TOOLS.md` | Hermes has built-in tool instructions |
+| `TOOLS.md` | `archive/workspace/TOOLS.md` | Caesar has built-in tool instructions |
 | `HEARTBEAT.md` | `archive/workspace/HEARTBEAT.md` | Use cron jobs for periodic tasks |
 | `BOOTSTRAP.md` | `archive/workspace/BOOTSTRAP.md` | Use context files or skills |
-| Cron jobs | `archive/cron-config.json` | Recreate with `hermes cron create` |
+| Cron jobs | `archive/cron-config.json` | Recreate with `caesar cron create` |
 | Plugins | `archive/plugins-config.json` | See [plugins guide](../user-guide/features/hooks.md) |
-| Hooks/webhooks | `archive/hooks-config.json` | Use `hermes webhook` or gateway hooks |
-| Memory backend | `archive/memory-backend-config.json` | Configure via `hermes honcho` |
-| Skills registry | `archive/skills-registry-config.json` | Use `hermes skills config` |
+| Hooks/webhooks | `archive/hooks-config.json` | Use `caesar webhook` or gateway hooks |
+| Memory backend | `archive/memory-backend-config.json` | Configure via `caesar honcho` |
+| Skills registry | `archive/skills-registry-config.json` | Use `caesar skills config` |
 | UI/identity | `archive/ui-identity-config.json` | Use `/skin` command |
 | Logging | `archive/logging-diagnostics-config.json` | Set in `config.yaml` logging section |
-| Multi-agent list | `archive/agents-list.json` | Use Hermes profiles |
+| Multi-agent list | `archive/agents-list.json` | Use Caesar profiles |
 | Channel bindings | `archive/bindings.json` | Manual setup per platform |
 | Complex channels | `archive/channels-deep-config.json` | Manual platform config |
 
@@ -207,21 +207,21 @@ OpenClaw config values for tokens and API keys can be in three formats:
 "channels": { "telegram": { "botToken": { "source": "env", "id": "TELEGRAM_BOT_TOKEN" } } }
 ```
 
-The migration resolves all three formats. For env templates and SecretRef objects with `source: "env"`, it looks up the value in `~/.openclaw/.env`. SecretRef objects with `source: "file"` or `source: "exec"` can't be resolved automatically — those values must be added to Hermes manually after migration.
+The migration resolves all three formats. For env templates and SecretRef objects with `source: "env"`, it looks up the value in `~/.openclaw/.env`. SecretRef objects with `source: "file"` or `source: "exec"` can't be resolved automatically — those values must be added to Caesar manually after migration.
 
 ## After migration
 
 1. **Check the migration report** — printed on completion with counts of migrated, skipped, and conflicting items.
 
-2. **Review archived files** — anything in `~/.hermes/migration/openclaw/<timestamp>/archive/` needs manual attention.
+2. **Review archived files** — anything in `~/.caesar/migration/openclaw/<timestamp>/archive/` needs manual attention.
 
-3. **Verify API keys** — run `hermes status` to check provider authentication.
+3. **Verify API keys** — run `caesar status` to check provider authentication.
 
-4. **Test messaging** — if you migrated platform tokens, restart the gateway: `systemctl --user restart hermes-gateway`
+4. **Test messaging** — if you migrated platform tokens, restart the gateway: `systemctl --user restart caesar-gateway`
 
-5. **Check session policies** — verify `hermes config get session_reset` matches your expectations.
+5. **Check session policies** — verify `caesar config get session_reset` matches your expectations.
 
-6. **Re-pair WhatsApp** — WhatsApp uses QR code pairing (Baileys), not token migration. Run `hermes whatsapp` to pair.
+6. **Re-pair WhatsApp** — WhatsApp uses QR code pairing (Baileys), not token migration. Run `caesar whatsapp` to pair.
 
 ## Troubleshooting
 
@@ -235,8 +235,8 @@ Keys might be in your `.env` file instead of `openclaw.json`. The migration chec
 
 ### Skills not appearing after migration
 
-Imported skills land in `~/.hermes/skills/openclaw-imports/`. Start a new session for them to take effect, or run `/skills` to verify they're loaded.
+Imported skills land in `~/.caesar/skills/openclaw-imports/`. Start a new session for them to take effect, or run `/skills` to verify they're loaded.
 
 ### TTS voice not migrated
 
-OpenClaw stores TTS settings in two places: `messages.tts.providers.*` and the top-level `talk` config. The migration checks both. If your voice ID was set via the OpenClaw UI (stored in a different path), you may need to set it manually: `hermes config set tts.elevenlabs.voice_id YOUR_VOICE_ID`.
+OpenClaw stores TTS settings in two places: `messages.tts.providers.*` and the top-level `talk` config. The migration checks both. If your voice ID was set via the OpenClaw UI (stored in a different path), you may need to set it manually: `caesar config set tts.elevenlabs.voice_id YOUR_VOICE_ID`.

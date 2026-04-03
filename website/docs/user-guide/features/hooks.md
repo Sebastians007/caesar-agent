@@ -6,11 +6,11 @@ description: "Run custom code at key lifecycle points — log activity, send ale
 
 # Event Hooks
 
-Hermes has two hook systems that run custom code at key lifecycle points:
+Caesar has two hook systems that run custom code at key lifecycle points:
 
 | System | Registered via | Runs in | Use case |
 |--------|---------------|---------|----------|
-| **[Gateway hooks](#gateway-event-hooks)** | `HOOK.yaml` + `handler.py` in `~/.hermes/hooks/` | Gateway only | Logging, alerts, webhooks |
+| **[Gateway hooks](#gateway-event-hooks)** | `HOOK.yaml` + `handler.py` in `~/.caesar/hooks/` | Gateway only | Logging, alerts, webhooks |
 | **[Plugin hooks](#plugin-hooks)** | `ctx.register_hook()` in a [plugin](/docs/user-guide/features/plugins) | CLI + Gateway | Tool interception, metrics, guardrails |
 
 Both systems are non-blocking — errors in any hook are caught and logged, never crashing the agent.
@@ -21,10 +21,10 @@ Gateway hooks fire automatically during gateway operation (Telegram, Discord, Sl
 
 ### Creating a Hook
 
-Each hook is a directory under `~/.hermes/hooks/` containing two files:
+Each hook is a directory under `~/.caesar/hooks/` containing two files:
 
 ```text
-~/.hermes/hooks/
+~/.caesar/hooks/
 └── my-hook/
     ├── HOOK.yaml      # Declares which events to listen for
     └── handler.py     # Python handler function
@@ -50,7 +50,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-LOG_FILE = Path.home() / ".hermes" / "hooks" / "my-hook" / "activity.log"
+LOG_FILE = Path.home() / ".caesar" / "hooks" / "my-hook" / "activity.log"
 
 async def handle(event_type: str, context: dict):
     """Called for each subscribed event. Must be named 'handle'."""
@@ -90,14 +90,14 @@ Handlers registered for `command:*` fire for any `command:` event (`command:mode
 
 #### Boot Checklist (BOOT.md) — Built-in
 
-The gateway ships with a built-in `boot-md` hook that looks for `~/.hermes/BOOT.md` on every startup. If the file exists, the agent runs its instructions in a background session. No installation needed — just create the file.
+The gateway ships with a built-in `boot-md` hook that looks for `~/.caesar/BOOT.md` on every startup. If the file exists, the agent runs its instructions in a background session. No installation needed — just create the file.
 
-**Create `~/.hermes/BOOT.md`:**
+**Create `~/.caesar/BOOT.md`:**
 
 ```markdown
 # Startup Checklist
 
-1. Check if any cron jobs failed overnight — run `hermes cron list`
+1. Check if any cron jobs failed overnight — run `caesar cron list`
 2. Send a message to Discord #general saying "Gateway restarted, all systems go"
 3. Check if /opt/app/deploy.log has any errors from the last 24 hours
 ```
@@ -113,7 +113,7 @@ No BOOT.md? The hook silently skips — zero overhead. Create the file whenever 
 Send yourself a message when the agent takes more than 10 steps:
 
 ```yaml
-# ~/.hermes/hooks/long-task-alert/HOOK.yaml
+# ~/.caesar/hooks/long-task-alert/HOOK.yaml
 name: long-task-alert
 description: Alert when agent is taking many steps
 events:
@@ -121,7 +121,7 @@ events:
 ```
 
 ```python
-# ~/.hermes/hooks/long-task-alert/handler.py
+# ~/.caesar/hooks/long-task-alert/handler.py
 import os
 import httpx
 
@@ -146,7 +146,7 @@ async def handle(event_type: str, context: dict):
 Track which slash commands are used:
 
 ```yaml
-# ~/.hermes/hooks/command-logger/HOOK.yaml
+# ~/.caesar/hooks/command-logger/HOOK.yaml
 name: command-logger
 description: Log slash command usage
 events:
@@ -154,12 +154,12 @@ events:
 ```
 
 ```python
-# ~/.hermes/hooks/command-logger/handler.py
+# ~/.caesar/hooks/command-logger/handler.py
 import json
 from datetime import datetime
 from pathlib import Path
 
-LOG = Path.home() / ".hermes" / "logs" / "command_usage.jsonl"
+LOG = Path.home() / ".caesar" / "logs" / "command_usage.jsonl"
 
 def handle(event_type: str, context: dict):
     LOG.parent.mkdir(parents=True, exist_ok=True)
@@ -179,7 +179,7 @@ def handle(event_type: str, context: dict):
 POST to an external service on new sessions:
 
 ```yaml
-# ~/.hermes/hooks/session-webhook/HOOK.yaml
+# ~/.caesar/hooks/session-webhook/HOOK.yaml
 name: session-webhook
 description: Notify external service on new sessions
 events:
@@ -188,10 +188,10 @@ events:
 ```
 
 ```python
-# ~/.hermes/hooks/session-webhook/handler.py
+# ~/.caesar/hooks/session-webhook/handler.py
 import httpx
 
-WEBHOOK_URL = "https://your-service.example.com/hermes-events"
+WEBHOOK_URL = "https://your-service.example.com/caesar-events"
 
 async def handle(event_type: str, context: dict):
     async with httpx.AsyncClient() as client:
@@ -203,7 +203,7 @@ async def handle(event_type: str, context: dict):
 
 ### How It Works
 
-1. On gateway startup, `HookRegistry.discover_and_load()` scans `~/.hermes/hooks/`
+1. On gateway startup, `HookRegistry.discover_and_load()` scans `~/.caesar/hooks/`
 2. Each subdirectory with `HOOK.yaml` + `handler.py` is loaded dynamically
 3. Handlers are registered for their declared events
 4. At each lifecycle point, `hooks.emit()` fires all matching handlers
@@ -246,7 +246,7 @@ def my_callback(**kwargs):
 ### Example: Block Dangerous Tools
 
 ```python
-# ~/.hermes/plugins/tool-guard/__init__.py
+# ~/.caesar/plugins/tool-guard/__init__.py
 BLOCKED = {"terminal", "write_file"}
 
 def guard(**kwargs):

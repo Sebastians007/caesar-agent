@@ -6,7 +6,7 @@ the best available backend without duplicating fallback logic.
 
 Resolution order for text tasks (auto mode):
   1. OpenRouter  (OPENROUTER_API_KEY)
-  2. Nous Portal (~/.hermes/auth.json active provider)
+  2. Nous Portal (~/.caesar/auth.json active provider)
   3. Custom endpoint (config.yaml model.base_url + OPENAI_API_KEY)
   4. Codex OAuth (Responses API via chatgpt.com with gpt-5.3-codex,
      wrapped to look like a chat.completions client)
@@ -48,8 +48,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from openai import OpenAI
 
 from agent.credential_pool import load_pool
-from hermes_cli.config import get_hermes_home
-from hermes_constants import OPENROUTER_BASE_URL
+from caesar_cli.config import get_caesar_home
+from caesar_constants import OPENROUTER_BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +68,15 @@ _API_KEY_PROVIDER_AUX_MODELS: Dict[str, str] = {
 
 # OpenRouter app attribution headers
 _OR_HEADERS = {
-    "HTTP-Referer": "https://hermes-agent.nousresearch.com",
-    "X-OpenRouter-Title": "Hermes Agent",
+    "HTTP-Referer": "https://github.com/Sebastians007/caesar-agent",
+    "X-OpenRouter-Title": "Caesar Agent",
     "X-OpenRouter-Categories": "productivity,cli-agent",
 }
 
 # Nous Portal extra_body for product attribution.
 # Callers should pass this as extra_body in chat.completions.create()
 # when the auxiliary client is backed by Nous Portal.
-NOUS_EXTRA_BODY = {"tags": ["product=hermes-agent"]}
+NOUS_EXTRA_BODY = {"tags": ["product=caesar-agent"]}
 
 # Set at resolve time — True if the auxiliary client points to Nous Portal
 auxiliary_is_nous: bool = False
@@ -86,7 +86,7 @@ _OPENROUTER_MODEL = "google/gemini-3-flash-preview"
 _NOUS_MODEL = "google/gemini-3-flash-preview"
 _NOUS_DEFAULT_BASE_URL = "https://inference-api.nousresearch.com/v1"
 _ANTHROPIC_DEFAULT_BASE_URL = "https://api.anthropic.com"
-_AUTH_JSON_PATH = get_hermes_home() / "auth.json"
+_AUTH_JSON_PATH = get_caesar_home() / "auth.json"
 
 # Codex fallback: uses the Responses API (the only endpoint the Codex
 # OAuth token can access) with a fast model for auxiliary tasks.
@@ -474,7 +474,7 @@ class AsyncAnthropicAuxiliaryClient:
 
 
 def _read_nous_auth() -> Optional[dict]:
-    """Read and validate ~/.hermes/auth.json for an active Nous provider.
+    """Read and validate ~/.caesar/auth.json for an active Nous provider.
 
     Returns the provider state dict if Nous is active with tokens,
     otherwise None.
@@ -522,14 +522,14 @@ def _nous_base_url() -> str:
 
 
 def _read_codex_access_token() -> Optional[str]:
-    """Read a valid, non-expired Codex OAuth access token from Hermes auth store."""
+    """Read a valid, non-expired Codex OAuth access token from Caesar auth store."""
     pool_present, entry = _select_pool_entry("openai-codex")
     if pool_present:
         token = _pool_runtime_api_key(entry)
         return token or None
 
     try:
-        from hermes_cli.auth import _read_codex_tokens
+        from caesar_cli.auth import _read_codex_tokens
         data = _read_codex_tokens()
         tokens = data.get("tokens", {})
         access_token = tokens.get("access_token")
@@ -563,7 +563,7 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
     credentials, or (None, None) if none are configured.
     """
     try:
-        from hermes_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
+        from caesar_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
     except ImportError:
         logger.debug("Could not import PROVIDER_REGISTRY for API-key fallback")
         return None, None
@@ -587,7 +587,7 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
             if "api.kimi.com" in base_url.lower():
                 extra["default_headers"] = {"User-Agent": "KimiCLI/1.0"}
             elif "api.githubcopilot.com" in base_url.lower():
-                from hermes_cli.models import copilot_default_headers
+                from caesar_cli.models import copilot_default_headers
 
                 extra["default_headers"] = copilot_default_headers()
             return OpenAI(api_key=api_key, base_url=base_url, **extra), model
@@ -604,7 +604,7 @@ def _resolve_api_key_provider() -> Tuple[Optional[OpenAI], Optional[str]]:
         if "api.kimi.com" in base_url.lower():
             extra["default_headers"] = {"User-Agent": "KimiCLI/1.0"}
         elif "api.githubcopilot.com" in base_url.lower():
-            from hermes_cli.models import copilot_default_headers
+            from caesar_cli.models import copilot_default_headers
 
             extra["default_headers"] = copilot_default_headers()
         return OpenAI(api_key=api_key, base_url=base_url, **extra), model
@@ -683,7 +683,7 @@ def _read_main_model() -> str:
     model. Environment variables are no longer consulted.
     """
     try:
-        from hermes_cli.config import load_config
+        from caesar_cli.config import load_config
         cfg = load_config()
         model_cfg = cfg.get("model", {})
         if isinstance(model_cfg, str) and model_cfg.strip():
@@ -705,7 +705,7 @@ def _resolve_custom_runtime() -> Tuple[Optional[str], Optional[str]]:
     environment.
     """
     try:
-        from hermes_cli.runtime_provider import resolve_runtime_provider
+        from caesar_cli.runtime_provider import resolve_runtime_provider
 
         runtime = resolve_runtime_provider(requested="custom")
     except Exception as exc:
@@ -786,7 +786,7 @@ def _try_anthropic() -> Tuple[Optional[Any], Optional[str]]:
     # base_url (e.g. Codex endpoint) would leak into Anthropic requests.
     base_url = _pool_runtime_base_url(entry, _ANTHROPIC_DEFAULT_BASE_URL) if pool_present else _ANTHROPIC_DEFAULT_BASE_URL
     try:
-        from hermes_cli.config import load_config
+        from caesar_cli.config import load_config
         cfg = load_config()
         model_cfg = cfg.get("model")
         if isinstance(model_cfg, dict):
@@ -823,13 +823,13 @@ def _resolve_forced_provider(forced: str) -> Tuple[Optional[OpenAI], Optional[st
     if forced == "nous":
         client, model = _try_nous()
         if client is None:
-            logger.warning("auxiliary.provider=nous but Nous Portal not configured (run: hermes login)")
+            logger.warning("auxiliary.provider=nous but Nous Portal not configured (run: caesar login)")
         return client, model
 
     if forced == "codex":
         client, model = _try_codex()
         if client is None:
-            logger.warning("auxiliary.provider=codex but no Codex OAuth token found (run: hermes model)")
+            logger.warning("auxiliary.provider=codex but no Codex OAuth token found (run: caesar model)")
         return client, model
 
     if forced == "main":
@@ -908,7 +908,7 @@ def _to_async_client(sync_client, model: str):
     if "openrouter" in base_lower:
         async_kwargs["default_headers"] = dict(_OR_HEADERS)
     elif "api.githubcopilot.com" in base_lower:
-        from hermes_cli.models import copilot_default_headers
+        from caesar_cli.models import copilot_default_headers
 
         async_kwargs["default_headers"] = copilot_default_headers()
     elif "api.kimi.com" in base_lower:
@@ -991,7 +991,7 @@ def resolve_provider_client(
         client, default = _try_nous()
         if client is None:
             logger.warning("resolve_provider_client: nous requested "
-                           "but Nous Portal not configured (run: hermes login)")
+                           "but Nous Portal not configured (run: caesar login)")
             return None, None
         final_model = model or default
         return (_to_async_client(client, final_model) if async_mode
@@ -1005,7 +1005,7 @@ def resolve_provider_client(
             codex_token = _read_codex_access_token()
             if not codex_token:
                 logger.warning("resolve_provider_client: openai-codex requested "
-                               "but no Codex OAuth token found (run: hermes model)")
+                               "but no Codex OAuth token found (run: caesar model)")
                 return None, None
             final_model = model or _CODEX_AUX_MODEL
             raw_client = OpenAI(api_key=codex_token, base_url=_CODEX_AUX_BASE_URL)
@@ -1014,7 +1014,7 @@ def resolve_provider_client(
         client, default = _try_codex()
         if client is None:
             logger.warning("resolve_provider_client: openai-codex requested "
-                           "but no Codex OAuth token found (run: hermes model)")
+                           "but no Codex OAuth token found (run: caesar model)")
             return None, None
         final_model = model or default
         return (_to_async_client(client, final_model) if async_mode
@@ -1053,9 +1053,9 @@ def resolve_provider_client(
 
     # ── API-key providers from PROVIDER_REGISTRY ─────────────────────
     try:
-        from hermes_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
+        from caesar_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
     except ImportError:
-        logger.debug("hermes_cli.auth not available for provider %s", provider)
+        logger.debug("caesar_cli.auth not available for provider %s", provider)
         return None, None
 
     pconfig = PROVIDER_REGISTRY.get(provider)
@@ -1093,7 +1093,7 @@ def resolve_provider_client(
         if "api.kimi.com" in base_url.lower():
             headers["User-Agent"] = "KimiCLI/1.0"
         elif "api.githubcopilot.com" in base_url.lower():
-            from hermes_cli.models import copilot_default_headers
+            from caesar_cli.models import copilot_default_headers
 
             headers.update(copilot_default_headers())
 
@@ -1197,7 +1197,7 @@ def _strict_vision_backend_available(provider: str) -> bool:
 def _preferred_main_vision_provider() -> Optional[str]:
     """Return the selected main provider when it is also a supported vision backend."""
     try:
-        from hermes_cli.config import load_config
+        from caesar_cli.config import load_config
 
         config = load_config()
         model_cfg = config.get("model", {})
@@ -1215,7 +1215,7 @@ def get_available_vision_backends() -> List[str]:
 
     This is the single source of truth for setup, tool gating, and runtime
     auto-routing of vision tasks. The selected main provider is preferred when
-    it is also a known-good vision backend; otherwise Hermes falls back through
+    it is also a known-good vision backend; otherwise Caesar falls back through
     the standard conservative order.
     """
     ordered = list(_VISION_AUTO_PROVIDER_ORDER)
@@ -1537,7 +1537,7 @@ def _resolve_task_provider_model(
 
     if task:
         try:
-            from hermes_cli.config import load_config
+            from caesar_cli.config import load_config
             config = load_config()
         except ImportError:
             config = {}
@@ -1597,7 +1597,7 @@ def _get_task_timeout(task: str, default: float = _DEFAULT_AUX_TIMEOUT) -> float
     if not task:
         return default
     try:
-        from hermes_cli.config import load_config
+        from caesar_cli.config import load_config
         config = load_config()
     except ImportError:
         return default
@@ -1651,7 +1651,7 @@ def _build_call_kwargs(
     # Provider-specific extra_body
     merged_extra = dict(extra_body or {})
     if provider == "nous" or auxiliary_is_nous:
-        merged_extra.setdefault("tags", []).extend(["product=hermes-agent"])
+        merged_extra.setdefault("tags", []).extend(["product=caesar-agent"])
     if merged_extra:
         kwargs["extra_body"] = merged_extra
 
@@ -1720,7 +1720,7 @@ def call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup"
+                f"Run: caesar setup"
             )
         resolved_provider = effective_provider or resolved_provider
     else:
@@ -1739,7 +1739,7 @@ def call_llm(
                 raise RuntimeError(
                     f"Provider '{_explicit}' is set in config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `hermes model`."
+                    f"variable, or switch to a different provider with `caesar model`."
                 )
             # For auto/custom, fall back to OpenRouter
             if not resolved_base_url:
@@ -1750,7 +1750,7 @@ def call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup")
+                f"Run: caesar setup")
 
     effective_timeout = timeout if timeout is not None else _get_task_timeout(task)
 
@@ -1877,7 +1877,7 @@ async def async_call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup"
+                f"Run: caesar setup"
             )
         resolved_provider = effective_provider or resolved_provider
     else:
@@ -1894,7 +1894,7 @@ async def async_call_llm(
                 raise RuntimeError(
                     f"Provider '{_explicit}' is set in config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `hermes model`."
+                    f"variable, or switch to a different provider with `caesar model`."
                 )
             if not resolved_base_url:
                 logger.warning("Provider %s unavailable, falling back to openrouter",
@@ -1905,7 +1905,7 @@ async def async_call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup")
+                f"Run: caesar setup")
 
     effective_timeout = timeout if timeout is not None else _get_task_timeout(task)
 

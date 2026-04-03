@@ -11,9 +11,9 @@ import os
 from dataclasses import dataclass, fields, replace
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from hermes_constants import OPENROUTER_BASE_URL
-import hermes_cli.auth as auth_mod
-from hermes_cli.auth import (
+from caesar_constants import OPENROUTER_BASE_URL
+import caesar_cli.auth as auth_mod
+from caesar_cli.auth import (
     ACCESS_TOKEN_REFRESH_SKEW_SECONDS,
     CODEX_ACCESS_TOKEN_REFRESH_SKEW_SECONDS,
     DEFAULT_AGENT_KEY_MIN_TTL_SECONDS,
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 def _load_config_safe() -> Optional[dict]:
     """Load config.yaml, returning None on any error."""
     try:
-        from hermes_cli.config import load_config
+        from caesar_cli.config import load_config
 
         return load_config()
     except Exception:
@@ -315,7 +315,7 @@ class CredentialPool:
 
                 refreshed = refresh_anthropic_oauth_pure(
                     entry.refresh_token,
-                    use_json=entry.source.endswith("hermes_pkce"),
+                    use_json=entry.source.endswith("caesar_pkce"),
                 )
                 updated = replace(
                     entry,
@@ -577,7 +577,7 @@ def _normalize_pool_priorities(provider: str, entries: List[PooledCredential]) -
     source_rank = {
         "env:ANTHROPIC_TOKEN": 0,
         "env:CLAUDE_CODE_OAUTH_TOKEN": 1,
-        "hermes_pkce": 2,
+        "caesar_pkce": 2,
         "claude_code": 3,
         "env:ANTHROPIC_API_KEY": 4,
     }
@@ -610,10 +610,10 @@ def _seed_from_singletons(provider: str, entries: List[PooledCredential]) -> Tup
     auth_store = _load_auth_store()
 
     if provider == "anthropic":
-        from agent.anthropic_adapter import read_claude_code_credentials, read_hermes_oauth_credentials
+        from agent.anthropic_adapter import read_claude_code_credentials, read_caesar_oauth_credentials
 
         for source_name, creds in (
-            ("hermes_pkce", read_hermes_oauth_credentials()),
+            ("caesar_pkce", read_caesar_oauth_credentials()),
             ("claude_code", read_claude_code_credentials()),
         ):
             if creds and creds.get("accessToken"):
@@ -750,7 +750,7 @@ def _prune_stale_seeded_entries(entries: List[PooledCredential], active_sources:
         or entry.source in active_sources
         or not (
             entry.source.startswith("env:")
-            or entry.source in {"claude_code", "hermes_pkce"}
+            or entry.source in {"claude_code", "caesar_pkce"}
         )
     ]
     if len(retained) == len(entries):

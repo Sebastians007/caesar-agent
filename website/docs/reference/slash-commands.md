@@ -6,12 +6,12 @@ description: "Complete reference for interactive CLI and messaging slash command
 
 # Slash Commands Reference
 
-Hermes has two slash-command surfaces, both driven by a central `COMMAND_REGISTRY` in `hermes_cli/commands.py`:
+Caesar has two slash-command surfaces, both driven by a central `COMMAND_REGISTRY` in `caesar_cli/commands.py`:
 
 - **Interactive CLI slash commands** — dispatched by `cli.py`, with autocomplete from the registry
 - **Messaging slash commands** — dispatched by `gateway/run.py`, with help text and platform menus generated from the registry
 
-Installed skills are also exposed as dynamic slash commands on both surfaces. That includes bundled skills like `/plan`, which opens plan mode and saves markdown plans under `.hermes/plans/` relative to the active workspace/backend working directory.
+Installed skills are also exposed as dynamic slash commands on both surfaces. That includes bundled skills like `/plan`, which opens plan mode and saves markdown plans under `.caesar/plans/` relative to the active workspace/backend working directory.
 
 ## Interactive CLI slash commands
 
@@ -35,7 +35,7 @@ Type `/` in the CLI to open the autocomplete menu. Built-in commands are case-in
 | `/resume [name]` | Resume a previously-named session |
 | `/statusbar` (alias: `/sb`) | Toggle the context/model status bar on or off |
 | `/background <prompt>` (alias: `/bg`) | Run a prompt in a separate background session. The agent processes your prompt independently — your current session stays free for other work. Results appear as a panel when the task finishes. See [CLI Background Sessions](/docs/user-guide/cli#background-sessions). |
-| `/plan [request]` | Load the bundled `plan` skill to write a markdown plan instead of executing the work. Plans are saved under `.hermes/plans/` relative to the active workspace/backend working directory. |
+| `/plan [request]` | Load the bundled `plan` skill to write a markdown plan instead of executing the work. Plans are saved under `.caesar/plans/` relative to the active workspace/backend working directory. |
 
 ### Configuration
 
@@ -90,7 +90,7 @@ Type `/` in the CLI to open the autocomplete menu. Built-in commands are case-in
 
 ### Quick commands
 
-User-defined quick commands from `quick_commands` in `~/.hermes/config.yaml` are also available as slash commands. These are resolved at dispatch time, not shown in the built-in autocomplete/help tables.
+User-defined quick commands from `quick_commands` in `~/.caesar/config.yaml` are also available as slash commands. These are resolved at dispatch time, not shown in the built-in autocomplete/help tables.
 
 ## Messaging slash commands
 
@@ -117,13 +117,13 @@ The messaging gateway supports the following built-in commands inside Telegram, 
 | `/voice [on\|off\|tts\|join\|channel\|leave\|status]` | Control spoken replies in chat. `join`/`channel`/`leave` manage Discord voice-channel mode. |
 | `/rollback [number]` | List or restore filesystem checkpoints. |
 | `/background <prompt>` | Run a prompt in a separate background session. Results are delivered back to the same chat when the task finishes. See [Messaging Background Sessions](/docs/user-guide/messaging/#background-sessions). |
-| `/plan [request]` | Load the bundled `plan` skill to write a markdown plan instead of executing the work. Plans are saved under `.hermes/plans/` relative to the active workspace/backend working directory. |
+| `/plan [request]` | Load the bundled `plan` skill to write a markdown plan instead of executing the work. Plans are saved under `.caesar/plans/` relative to the active workspace/backend working directory. |
 | `/reload-mcp` (alias: `/reload_mcp`) | Reload MCP servers from config. |
 | `/yolo` | Toggle YOLO mode — skip all dangerous command approval prompts. |
 | `/commands [page]` | Browse all commands and skills (paginated). |
 | `/approve [session\|always]` | Approve and execute a pending dangerous command. `session` approves for this session only; `always` adds to permanent allowlist. |
 | `/deny` | Reject a pending dangerous command. |
-| `/update` | Update Hermes Agent to the latest version. |
+| `/update` | Update Caesar Agent to the latest version. |
 | `/help` | Show messaging help. |
 | `/<skill-name>` | Invoke any installed skill by name. |
 

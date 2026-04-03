@@ -86,7 +86,7 @@ def test_aiagent_reuses_existing_errors_log_handler():
     """Repeated AIAgent init should not accumulate duplicate errors.log handlers."""
     root_logger = logging.getLogger()
     original_handlers = list(root_logger.handlers)
-    error_log_path = (run_agent._hermes_home / "logs" / "errors.log").resolve()
+    error_log_path = (run_agent._caesar_home / "logs" / "errors.log").resolve()
 
     try:
         for handler in list(root_logger.handlers):
@@ -664,7 +664,7 @@ class TestToolUseEnforcementConfig:
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
             patch(
-                "hermes_cli.config.load_config",
+                "caesar_cli.config.load_config",
                 return_value={"agent": {"tool_use_enforcement": tool_use_enforcement}},
             ),
         ):
@@ -761,7 +761,7 @@ class TestToolUseEnforcementConfig:
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
             patch(
-                "hermes_cli.config.load_config",
+                "caesar_cli.config.load_config",
                 return_value={"agent": {"tool_use_enforcement": True}},
             ),
         ):
@@ -1929,7 +1929,7 @@ class TestNousCredentialRefresh:
             return _RebuiltClient()
 
         monkeypatch.setattr(
-            "hermes_cli.auth.resolve_nous_runtime_credentials", _fake_resolve
+            "caesar_cli.auth.resolve_nous_runtime_credentials", _fake_resolve
         )
 
         agent.client = _ExistingClient()
@@ -2162,7 +2162,7 @@ class TestSystemPromptStability:
         # Should have built fresh, not queried the DB
         mock_db.get_session.assert_not_called()
         assert agent._cached_system_prompt is not None
-        assert "Hermes Agent" in agent._cached_system_prompt
+        assert "Caesar Agent" in agent._cached_system_prompt
 
     def test_fresh_build_when_db_has_no_prompt(self, agent):
         """If the session DB has no stored prompt, build fresh even with history."""
@@ -2189,7 +2189,7 @@ class TestSystemPromptStability:
                 agent._cached_system_prompt = agent._build_system_prompt()
 
         # Empty string is falsy, so should fall through to fresh build
-        assert "Hermes Agent" in agent._cached_system_prompt
+        assert "Caesar Agent" in agent._cached_system_prompt
 
 class TestBudgetPressure:
     """Budget pressure warning system (issue #414)."""

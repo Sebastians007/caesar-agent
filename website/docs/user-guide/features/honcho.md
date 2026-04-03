@@ -13,30 +13,30 @@ Honcho has been integrated into the [Memory Providers](./memory-providers.md) sy
 ## Setup
 
 ```bash
-hermes memory setup    # select "honcho"
+caesar memory setup    # select "honcho"
 ```
 
 Or set manually:
 
 ```yaml
-# ~/.hermes/config.yaml
+# ~/.caesar/config.yaml
 memory:
   provider: honcho
 ```
 
 ```bash
-echo "HONCHO_API_KEY=your-key" >> ~/.hermes/.env
+echo "HONCHO_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
-## Migrating from `hermes honcho`
+## Migrating from `caesar honcho`
 
-If you previously used `hermes honcho setup`:
+If you previously used `caesar honcho setup`:
 
 1. Your existing configuration (`honcho.json` or `~/.honcho/config.json`) is preserved
 2. Your server-side data (memories, conclusions, user profiles) is intact
 3. Just set `memory.provider: honcho` to reactivate
 
-No re-login or re-setup needed. Run `hermes memory setup` and select "honcho" — the wizard detects your existing config.
+No re-login or re-setup needed. Run `caesar memory setup` and select "honcho" — the wizard detects your existing config.
 
 ## Full Documentation
 

@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 title: "CLI Commands Reference"
-description: "Authoritative reference for Hermes terminal commands and command families"
+description: "Authoritative reference for Caesar terminal commands and command families"
 ---
 
 # CLI Commands Reference
@@ -13,7 +13,7 @@ For in-chat slash commands, see [Slash Commands Reference](./slash-commands.md).
 ## Global entrypoint
 
 ```bash
-hermes [global-options] <command> [subcommand/options]
+caesar [global-options] <command> [subcommand/options]
 ```
 
 ### Global options
@@ -21,7 +21,7 @@ hermes [global-options] <command> [subcommand/options]
 | Option | Description |
 |--------|-------------|
 | `--version`, `-V` | Show version and exit. |
-| `--profile <name>`, `-p <name>` | Select which Hermes profile to use for this invocation. Overrides the sticky default set by `hermes profile use`. |
+| `--profile <name>`, `-p <name>` | Select which Caesar profile to use for this invocation. Overrides the sticky default set by `caesar profile use`. |
 | `--resume <session>`, `-r <session>` | Resume a previous session by ID or title. |
 | `--continue [name]`, `-c [name]` | Resume the most recent session, or the most recent session matching a title. |
 | `--worktree`, `-w` | Start in an isolated git worktree for parallel-agent workflows. |
@@ -32,38 +32,38 @@ hermes [global-options] <command> [subcommand/options]
 
 | Command | Purpose |
 |---------|---------|
-| `hermes chat` | Interactive or one-shot chat with the agent. |
-| `hermes model` | Interactively choose the default provider and model. |
-| `hermes gateway` | Run or manage the messaging gateway service. |
-| `hermes setup` | Interactive setup wizard for all or part of the configuration. |
-| `hermes whatsapp` | Configure and pair the WhatsApp bridge. |
-| `hermes login` / `logout` | Authenticate with OAuth-backed providers. |
-| `hermes auth` | Manage credential pools — add, list, remove, reset, set strategy. |
-| `hermes status` | Show agent, auth, and platform status. |
-| `hermes cron` | Inspect and tick the cron scheduler. |
-| `hermes webhook` | Manage dynamic webhook subscriptions for event-driven activation. |
-| `hermes doctor` | Diagnose config and dependency issues. |
-| `hermes config` | Show, edit, migrate, and query configuration files. |
-| `hermes pairing` | Approve or revoke messaging pairing codes. |
-| `hermes skills` | Browse, install, publish, audit, and configure skills. |
-| `hermes honcho` | Manage Honcho cross-session memory integration. |
-| `hermes acp` | Run Hermes as an ACP server for editor integration. |
-| `hermes mcp` | Manage MCP server configurations and run Hermes as an MCP server. |
-| `hermes plugins` | Manage Hermes Agent plugins (install, enable, disable, remove). |
-| `hermes tools` | Configure enabled tools per platform. |
-| `hermes sessions` | Browse, export, prune, rename, and delete sessions. |
-| `hermes insights` | Show token/cost/activity analytics. |
-| `hermes claw` | OpenClaw migration helpers. |
-| `hermes profile` | Manage profiles — multiple isolated Hermes instances. |
-| `hermes completion` | Print shell completion scripts (bash/zsh). |
-| `hermes version` | Show version information. |
-| `hermes update` | Pull latest code and reinstall dependencies. |
-| `hermes uninstall` | Remove Hermes from the system. |
+| `caesar chat` | Interactive or one-shot chat with the agent. |
+| `caesar model` | Interactively choose the default provider and model. |
+| `caesar gateway` | Run or manage the messaging gateway service. |
+| `caesar setup` | Interactive setup wizard for all or part of the configuration. |
+| `caesar whatsapp` | Configure and pair the WhatsApp bridge. |
+| `caesar login` / `logout` | Authenticate with OAuth-backed providers. |
+| `caesar auth` | Manage credential pools — add, list, remove, reset, set strategy. |
+| `caesar status` | Show agent, auth, and platform status. |
+| `caesar cron` | Inspect and tick the cron scheduler. |
+| `caesar webhook` | Manage dynamic webhook subscriptions for event-driven activation. |
+| `caesar doctor` | Diagnose config and dependency issues. |
+| `caesar config` | Show, edit, migrate, and query configuration files. |
+| `caesar pairing` | Approve or revoke messaging pairing codes. |
+| `caesar skills` | Browse, install, publish, audit, and configure skills. |
+| `caesar honcho` | Manage Honcho cross-session memory integration. |
+| `caesar acp` | Run Caesar as an ACP server for editor integration. |
+| `caesar mcp` | Manage MCP server configurations and run Caesar as an MCP server. |
+| `caesar plugins` | Manage Caesar Agent plugins (install, enable, disable, remove). |
+| `caesar tools` | Configure enabled tools per platform. |
+| `caesar sessions` | Browse, export, prune, rename, and delete sessions. |
+| `caesar insights` | Show token/cost/activity analytics. |
+| `caesar claw` | OpenClaw migration helpers. |
+| `caesar profile` | Manage profiles — multiple isolated Caesar instances. |
+| `caesar completion` | Print shell completion scripts (bash/zsh). |
+| `caesar version` | Show version information. |
+| `caesar update` | Pull latest code and reinstall dependencies. |
+| `caesar uninstall` | Remove Caesar from the system. |
 
-## `hermes chat`
+## `caesar chat`
 
 ```bash
-hermes chat [options]
+caesar chat [options]
 ```
 
 Common options:
@@ -87,20 +87,20 @@ Common options:
 Examples:
 
 ```bash
-hermes
-hermes chat -q "Summarize the latest PRs"
-hermes chat --provider openrouter --model anthropic/claude-sonnet-4.6
-hermes chat --toolsets web,terminal,skills
-hermes chat --quiet -q "Return only JSON"
-hermes chat --worktree -q "Review this repo and open a PR"
+caesar
+caesar chat -q "Summarize the latest PRs"
+caesar chat --provider openrouter --model anthropic/claude-sonnet-4.6
+caesar chat --toolsets web,terminal,skills
+caesar chat --quiet -q "Return only JSON"
+caesar chat --worktree -q "Review this repo and open a PR"
 ```
 
-## `hermes model`
+## `caesar model`
 
 Interactive provider + model selector.
 
 ```bash
-hermes model
+caesar model
 ```
 
 Use this when you want to:
@@ -126,10 +126,10 @@ Switch models without leaving a session:
 
 Provider and base URL changes are persisted to `config.yaml` automatically. When switching away from a custom endpoint, the stale base URL is cleared to prevent it leaking into other providers.
 
-## `hermes gateway`
+## `caesar gateway`
 
 ```bash
-hermes gateway <subcommand>
+caesar gateway <subcommand>
 ```
 
 Subcommands:
@@ -145,10 +145,10 @@ Subcommands:
 | `uninstall` | Remove the installed service. |
 | `setup` | Interactive messaging-platform setup. |
 
-## `hermes setup`
+## `caesar setup`
 
 ```bash
-hermes setup [model|terminal|gateway|tools|agent] [--non-interactive] [--reset]
+caesar setup [model|terminal|gateway|tools|agent] [--non-interactive] [--reset]
 ```
 
 Use the full wizard or jump into one section:
@@ -168,19 +168,19 @@ Options:
 | `--non-interactive` | Use defaults / environment values without prompts. |
 | `--reset` | Reset configuration to defaults before setup. |
 
-## `hermes whatsapp`
+## `caesar whatsapp`
 
 ```bash
-hermes whatsapp
+caesar whatsapp
 ```
 
 Runs the WhatsApp pairing/setup flow, including mode selection and QR-code pairing.
 
-## `hermes login` / `hermes logout`
+## `caesar login` / `caesar logout`
 
 ```bash
-hermes login [--provider nous|openai-codex] [--portal-url ...] [--inference-url ...]
-hermes logout [--provider nous|openai-codex]
+caesar login [--provider nous|openai-codex] [--portal-url ...] [--inference-url ...]
+caesar logout [--provider nous|openai-codex]
 ```
 
 `login` supports:
@@ -193,26 +193,26 @@ Useful options for `login`:
 - `--ca-bundle <pem>`
 - `--insecure`
 
-## `hermes auth`
+## `caesar auth`
 
 Manage credential pools for same-provider key rotation. See [Credential Pools](/docs/user-guide/features/credential-pools) for full documentation.
 
 ```bash
-hermes auth                                              # Interactive wizard
-hermes auth list                                         # Show all pools
-hermes auth list openrouter                              # Show specific provider
-hermes auth add openrouter --api-key sk-or-v1-xxx        # Add API key
-hermes auth add anthropic --type oauth                   # Add OAuth credential
-hermes auth remove openrouter 2                          # Remove by index
-hermes auth reset openrouter                             # Clear cooldowns
+caesar auth                                              # Interactive wizard
+caesar auth list                                         # Show all pools
+caesar auth list openrouter                              # Show specific provider
+caesar auth add openrouter --api-key sk-or-v1-xxx        # Add API key
+caesar auth add anthropic --type oauth                   # Add OAuth credential
+caesar auth remove openrouter 2                          # Remove by index
+caesar auth reset openrouter                             # Clear cooldowns
 ```
 
 Subcommands: `add`, `list`, `remove`, `reset`. When called with no subcommand, launches the interactive management wizard.
 
-## `hermes status`
+## `caesar status`
 
 ```bash
-hermes status [--all] [--deep]
+caesar status [--all] [--deep]
 ```
 
 | Option | Description |
@@ -220,10 +220,10 @@ hermes status [--all] [--deep]
 | `--all` | Show all details in a shareable redacted format. |
 | `--deep` | Run deeper checks that may take longer. |
 
-## `hermes cron`
+## `caesar cron`
 
 ```bash
-hermes cron <list|create|edit|pause|resume|run|remove|status|tick>
+caesar cron <list|create|edit|pause|resume|run|remove|status|tick>
 ```
 
 | Subcommand | Description |
@@ -238,10 +238,10 @@ hermes cron <list|create|edit|pause|resume|run|remove|status|tick>
 | `status` | Check whether the cron scheduler is running. |
 | `tick` | Run due jobs once and exit. |
 
-## `hermes webhook`
+## `caesar webhook`
 
 ```bash
-hermes webhook <subscribe|list|remove|test>
+caesar webhook <subscribe|list|remove|test>
 ```
 
 Manage dynamic webhook subscriptions for event-driven agent activation. Requires the webhook platform to be enabled in config — if not configured, prints setup instructions.
@@ -253,10 +253,10 @@ Manage dynamic webhook subscriptions for event-driven agent activation. Requires
 | `remove` / `rm` | Delete a dynamic subscription. Static routes from config.yaml are not affected. |
 | `test` | Send a test POST to verify a subscription is working. |
 
-### `hermes webhook subscribe`
+### `caesar webhook subscribe`
 
 ```bash
-hermes webhook subscribe <name> [options]
+caesar webhook subscribe <name> [options]
 ```
 
 | Option | Description |
@@ -269,22 +269,22 @@ hermes webhook subscribe <name> [options]
 | `--deliver-chat-id` | Target chat/channel ID for cross-platform delivery. |
 | `--secret` | Custom HMAC secret. Auto-generated if omitted. |
 
-Subscriptions persist to `~/.hermes/webhook_subscriptions.json` and are hot-reloaded by the webhook adapter without a gateway restart.
+Subscriptions persist to `~/.caesar/webhook_subscriptions.json` and are hot-reloaded by the webhook adapter without a gateway restart.
 
-## `hermes doctor`
+## `caesar doctor`
 
 ```bash
-hermes doctor [--fix]
+caesar doctor [--fix]
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--fix` | Attempt automatic repairs where possible. |
 
-## `hermes config`
+## `caesar config`
 
 ```bash
-hermes config <subcommand>
+caesar config <subcommand>
 ```
 
 Subcommands:
@@ -299,10 +299,10 @@ Subcommands:
 | `check` | Check for missing or stale config. |
 | `migrate` | Add newly introduced options interactively. |
 
-## `hermes pairing`
+## `caesar pairing`
 
 ```bash
-hermes pairing <list|approve|revoke|clear-pending>
+caesar pairing <list|approve|revoke|clear-pending>
 ```
 
 | Subcommand | Description |
@@ -312,10 +312,10 @@ hermes pairing <list|approve|revoke|clear-pending>
 | `revoke <platform> <user-id>` | Revoke a user's access. |
 | `clear-pending` | Clear pending pairing codes. |
 
-## `hermes skills`
+## `caesar skills`
 
 ```bash
-hermes skills <subcommand>
+caesar skills <subcommand>
 ```
 
 Subcommands:
@@ -339,29 +339,29 @@ Subcommands:
 Common examples:
 
 ```bash
-hermes skills browse
-hermes skills browse --source official
-hermes skills search react --source skills-sh
-hermes skills search https://mintlify.com/docs --source well-known
-hermes skills inspect official/security/1password
-hermes skills inspect skills-sh/vercel-labs/json-render/json-render-react
-hermes skills install official/migration/openclaw-migration
-hermes skills install skills-sh/anthropics/skills/pdf --force
-hermes skills check
-hermes skills update
-hermes skills config
+caesar skills browse
+caesar skills browse --source official
+caesar skills search react --source skills-sh
+caesar skills search https://mintlify.com/docs --source well-known
+caesar skills inspect official/security/1password
+caesar skills inspect skills-sh/vercel-labs/json-render/json-render-react
+caesar skills install official/migration/openclaw-migration
+caesar skills install skills-sh/anthropics/skills/pdf --force
+caesar skills check
+caesar skills update
+caesar skills config
 ```
 
 Notes:
 - `--force` can override non-dangerous policy blocks for third-party/community skills.
 - `--force` does not override a `dangerous` scan verdict.
 - `--source skills-sh` searches the public `skills.sh` directory.
-- `--source well-known` lets you point Hermes at a site exposing `/.well-known/skills/index.json`.
+- `--source well-known` lets you point Caesar at a site exposing `/.well-known/skills/index.json`.
 
-## `hermes honcho`
+## `caesar honcho`
 
 ```bash
-hermes honcho <subcommand>
+caesar honcho <subcommand>
 ```
 
 Subcommands:
@@ -376,20 +376,20 @@ Subcommands:
 | `mode` | Show or set memory mode: `hybrid`, `honcho`, or `local`. |
 | `tokens` | Show or set token budgets for context and dialectic. |
 | `identity` | Seed or show the AI peer identity representation. |
-| `migrate` | Migration guide from openclaw-honcho to Hermes Honcho. |
+| `migrate` | Migration guide from openclaw-honcho to Caesar Honcho. |
 
-## `hermes acp`
+## `caesar acp`
 
 ```bash
-hermes acp
+caesar acp
 ```
 
-Starts Hermes as an ACP (Agent Client Protocol) stdio server for editor integration.
+Starts Caesar as an ACP (Agent Client Protocol) stdio server for editor integration.
 
 Related entrypoints:
 
 ```bash
-hermes-acp
+caesar-acp
 python -m acp_adapter
 ```
 
@@ -401,32 +401,32 @@ pip install -e '.[acp]'
 
 See [ACP Editor Integration](../user-guide/features/acp.md) and [ACP Internals](../developer-guide/acp-internals.md).
 
-## `hermes mcp`
+## `caesar mcp`
 
 ```bash
-hermes mcp <subcommand>
+caesar mcp <subcommand>
 ```
 
-Manage MCP (Model Context Protocol) server configurations and run Hermes as an MCP server.
+Manage MCP (Model Context Protocol) server configurations and run Caesar as an MCP server.
 
 | Subcommand | Description |
 |------------|-------------|
-| `serve [-v\|--verbose]` | Run Hermes as an MCP server — expose conversations to other agents. |
+| `serve [-v\|--verbose]` | Run Caesar as an MCP server — expose conversations to other agents. |
 | `add <name> [--url URL] [--command CMD] [--args ...] [--auth oauth\|header]` | Add an MCP server with automatic tool discovery. |
 | `remove <name>` (alias: `rm`) | Remove an MCP server from config. |
 | `list` (alias: `ls`) | List configured MCP servers. |
 | `test <name>` | Test connection to an MCP server. |
 | `configure <name>` (alias: `config`) | Toggle tool selection for a server. |
 
-See [MCP Config Reference](./mcp-config-reference.md), [Use MCP with Hermes](../guides/use-mcp-with-hermes.md), and [MCP Server Mode](../user-guide/features/mcp.md#running-hermes-as-an-mcp-server).
+See [MCP Config Reference](./mcp-config-reference.md), [Use MCP with Caesar](../guides/use-mcp-with-caesar.md), and [MCP Server Mode](../user-guide/features/mcp.md#running-caesar-as-an-mcp-server).
 
-## `hermes plugins`
+## `caesar plugins`
 
 ```bash
-hermes plugins [subcommand]
+caesar plugins [subcommand]
 ```
 
-Manage Hermes Agent plugins. Running `hermes plugins` with no subcommand launches an interactive curses checklist to enable/disable installed plugins.
+Manage Caesar Agent plugins. Running `caesar plugins` with no subcommand launches an interactive curses checklist to enable/disable installed plugins.
 
 | Subcommand | Description |
 |------------|-------------|
@@ -440,12 +440,12 @@ Manage Hermes Agent plugins. Running `hermes plugins` with no subcommand launche
 
 Disabled plugins are stored in `config.yaml` under `plugins.disabled` and skipped during loading.
 
-See [Plugins](../user-guide/features/plugins.md) and [Build a Hermes Plugin](../guides/build-a-hermes-plugin.md).
+See [Plugins](../user-guide/features/plugins.md) and [Build a Caesar Plugin](../guides/build-a-caesar-plugin.md).
 
-## `hermes tools`
+## `caesar tools`
 
 ```bash
-hermes tools [--summary]
+caesar tools [--summary]
 ```
 
 | Option | Description |
@@ -454,10 +454,10 @@ hermes tools [--summary]
 
 Without `--summary`, this launches the interactive per-platform tool configuration UI.
 
-## `hermes sessions`
+## `caesar sessions`
 
 ```bash
-hermes sessions <subcommand>
+caesar sessions <subcommand>
 ```
 
 Subcommands:
@@ -472,10 +472,10 @@ Subcommands:
 | `stats` | Show session-store statistics. |
 | `rename <session-id> <title>` | Set or change a session title. |
 
-## `hermes insights`
+## `caesar insights`
 
 ```bash
-hermes insights [--days N] [--source platform]
+caesar insights [--days N] [--source platform]
 ```
 
 | Option | Description |
@@ -483,19 +483,19 @@ hermes insights [--days N] [--source platform]
 | `--days <n>` | Analyze the last `n` days (default: 30). |
 | `--source <platform>` | Filter by source such as `cli`, `telegram`, or `discord`. |
 
-## `hermes claw`
+## `caesar claw`
 
 ```bash
-hermes claw migrate [options]
+caesar claw migrate [options]
 ```
 
-Migrate your OpenClaw setup to Hermes. Reads from `~/.openclaw` (or a custom path) and writes to `~/.hermes`. Automatically detects legacy directory names (`~/.clawdbot`, `~/.moldbot`) and config filenames (`clawdbot.json`, `moldbot.json`).
+Migrate your OpenClaw setup to Caesar. Reads from `~/.openclaw` (or a custom path) and writes to `~/.caesar`. Automatically detects legacy directory names (`~/.clawdbot`, `~/.moldbot`) and config filenames (`clawdbot.json`, `moldbot.json`).
 
 | Option | Description |
 |--------|-------------|
 | `--dry-run` | Preview what would be migrated without writing anything. |
 | `--preset <name>` | Migration preset: `full` (default, includes secrets) or `user-data` (excludes API keys). |
-| `--overwrite` | Overwrite existing Hermes files on conflicts (default: skip). |
+| `--overwrite` | Overwrite existing Caesar files on conflicts (default: skip). |
 | `--migrate-secrets` | Include API keys in migration (enabled by default with `--preset full`). |
 | `--source <path>` | Custom OpenClaw directory (default: `~/.openclaw`). |
 | `--workspace-target <path>` | Target directory for workspace instructions (AGENTS.md). |
@@ -504,7 +504,7 @@ Migrate your OpenClaw setup to Hermes. Reads from `~/.openclaw` (or a custom pat
 
 ### What gets migrated
 
-The migration covers 30+ categories across persona, memory, skills, model providers, messaging platforms, agent behavior, session policies, MCP servers, TTS, and more. Items are either **directly imported** into Hermes equivalents or **archived** for manual review.
+The migration covers 30+ categories across persona, memory, skills, model providers, messaging platforms, agent behavior, session policies, MCP servers, TTS, and more. Items are either **directly imported** into Caesar equivalents or **archived** for manual review.
 
 **Directly imported:** SOUL.md, MEMORY.md, USER.md, AGENTS.md, skills (4 source directories), default model, custom providers, MCP servers, messaging platform tokens and allowlists (Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Mattermost), agent defaults (reasoning effort, compression, human delay, timezone, sandbox), session reset policies, approval rules, TTS config, browser settings, tool settings, exec timeout, command allowlist, gateway config, and API keys from 3 sources.
 
@@ -518,25 +518,25 @@ For the complete config key mapping, SecretRef handling details, and post-migrat
 
 ```bash
 # Preview what would be migrated
-hermes claw migrate --dry-run
+caesar claw migrate --dry-run
 
 # Full migration including API keys
-hermes claw migrate --preset full
+caesar claw migrate --preset full
 
 # Migrate user data only (no secrets), overwrite conflicts
-hermes claw migrate --preset user-data --overwrite
+caesar claw migrate --preset user-data --overwrite
 
 # Migrate from a custom OpenClaw path
-hermes claw migrate --source /home/user/old-openclaw
+caesar claw migrate --source /home/user/old-openclaw
 ```
 
-## `hermes profile`
+## `caesar profile`
 
 ```bash
-hermes profile <subcommand>
+caesar profile <subcommand>
 ```
 
-Manage profiles — multiple isolated Hermes instances, each with its own config, sessions, skills, and home directory.
+Manage profiles — multiple isolated Caesar instances, each with its own config, sessions, skills, and home directory.
 
 | Subcommand | Description |
 |------------|-------------|
@@ -553,40 +553,40 @@ Manage profiles — multiple isolated Hermes instances, each with its own config
 Examples:
 
 ```bash
-hermes profile list
-hermes profile create work --clone
-hermes profile use work
-hermes profile alias work --name h-work
-hermes profile export work -o work-backup.tar.gz
-hermes profile import work-backup.tar.gz --name restored
-hermes -p work chat -q "Hello from work profile"
+caesar profile list
+caesar profile create work --clone
+caesar profile use work
+caesar profile alias work --name h-work
+caesar profile export work -o work-backup.tar.gz
+caesar profile import work-backup.tar.gz --name restored
+caesar -p work chat -q "Hello from work profile"
 ```
 
-## `hermes completion`
+## `caesar completion`
 
 ```bash
-hermes completion [bash|zsh]
+caesar completion [bash|zsh]
 ```
 
-Print a shell completion script to stdout. Source the output in your shell profile for tab-completion of Hermes commands, subcommands, and profile names.
+Print a shell completion script to stdout. Source the output in your shell profile for tab-completion of Caesar commands, subcommands, and profile names.
 
 Examples:
 
 ```bash
 # Bash
-hermes completion bash >> ~/.bashrc
+caesar completion bash >> ~/.bashrc
 
 # Zsh
-hermes completion zsh >> ~/.zshrc
+caesar completion zsh >> ~/.zshrc
 ```
 
 ## Maintenance commands
 
 | Command | Description |
 |---------|-------------|
-| `hermes version` | Print version information. |
-| `hermes update` | Pull latest changes and reinstall dependencies. |
-| `hermes uninstall [--full] [--yes]` | Remove Hermes, optionally deleting all config/data. |
+| `caesar version` | Print version information. |
+| `caesar update` | Pull latest changes and reinstall dependencies. |
+| `caesar uninstall [--full] [--yes]` | Remove Caesar, optionally deleting all config/data. |
 
 ## See also
 

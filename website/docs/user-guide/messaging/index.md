@@ -1,14 +1,14 @@
 ---
 sidebar_position: 1
 title: "Messaging Gateway"
-description: "Chat with Hermes from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Webhooks, or any OpenAI-compatible frontend via the API server — architecture and setup overview"
+description: "Chat with Caesar from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Webhooks, or any OpenAI-compatible frontend via the API server — architecture and setup overview"
 ---
 
 # Messaging Gateway
 
-Chat with Hermes from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Feishu/Lark, WeCom, or your browser. The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs, and delivers voice messages.
+Chat with Caesar from Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Home Assistant, Mattermost, Matrix, DingTalk, Feishu/Lark, WeCom, or your browser. The gateway is a single background process that connects to all your configured platforms, handles sessions, runs cron jobs, and delivers voice messages.
 
-For the full voice feature set — including CLI microphone mode, spoken replies in messaging, and Discord voice-channel conversations — see [Voice Mode](/docs/user-guide/features/voice-mode) and [Use Voice Mode with Hermes](/docs/guides/use-voice-mode-with-hermes).
+For the full voice feature set — including CLI microphone mode, spoken replies in messaging, and Discord voice-channel conversations — see [Voice Mode](/docs/user-guide/features/voice-mode) and [Use Voice Mode with Caesar](/docs/guides/use-voice-mode-with-caesar).
 
 ## Platform Comparison
 
@@ -34,7 +34,7 @@ For the full voice feature set — including CLI microphone mode, spoken replies
 
 ```mermaid
 flowchart TB
-    subgraph Gateway["Hermes Gateway"]
+    subgraph Gateway["Caesar Gateway"]
         subgraph Adapters["Platform adapters"]
             tg[Telegram]
             dc[Discord]
@@ -82,7 +82,7 @@ Each platform adapter receives messages, routes them through a per-chat session 
 The easiest way to configure messaging platforms is the interactive wizard:
 
 ```bash
-hermes gateway setup        # Interactive setup for all messaging platforms
+caesar gateway setup        # Interactive setup for all messaging platforms
 ```
 
 This walks you through configuring each platform with arrow-key selection, shows which platforms are already configured, and offers to start/restart the gateway when done.
@@ -90,14 +90,14 @@ This walks you through configuring each platform with arrow-key selection, shows
 ## Gateway Commands
 
 ```bash
-hermes gateway              # Run in foreground
-hermes gateway setup        # Configure messaging platforms interactively
-hermes gateway install      # Install as a user service (Linux) / launchd service (macOS)
-sudo hermes gateway install --system   # Linux only: install a boot-time system service
-hermes gateway start        # Start the default service
-hermes gateway stop         # Stop the default service
-hermes gateway status       # Check default service status
-hermes gateway status --system         # Linux only: inspect the system service explicitly
+caesar gateway              # Run in foreground
+caesar gateway setup        # Configure messaging platforms interactively
+caesar gateway install      # Install as a user service (Linux) / launchd service (macOS)
+sudo caesar gateway install --system   # Linux only: install a boot-time system service
+caesar gateway start        # Start the default service
+caesar gateway stop         # Stop the default service
+caesar gateway status       # Check default service status
+caesar gateway status --system         # Linux only: inspect the system service explicitly
 ```
 
 ## Chat Commands (Inside Messaging)
@@ -125,7 +125,7 @@ hermes gateway status --system         # Linux only: inspect the system service 
 | `/rollback [number]` | List or restore filesystem checkpoints |
 | `/background <prompt>` | Run a prompt in a separate background session |
 | `/reload-mcp` | Reload MCP servers from config |
-| `/update` | Update Hermes Agent to the latest version |
+| `/update` | Update Caesar Agent to the latest version |
 | `/help` | Show available commands |
 | `/<skill-name>` | Invoke any installed skill |
 
@@ -145,7 +145,7 @@ Sessions reset based on configurable policies:
 | Idle | 1440 min | Reset after N minutes of inactivity |
 | Both | (combined) | Whichever triggers first |
 
-Configure per-platform overrides in `~/.hermes/gateway.json`:
+Configure per-platform overrides in `~/.caesar/gateway.json`:
 
 ```json
 {
@@ -185,11 +185,11 @@ Instead of manually configuring user IDs, unknown users receive a one-time pairi
 ```bash
 # The user sees: "Pairing code: XKGH5N7P"
 # You approve them with:
-hermes pairing approve telegram XKGH5N7P
+caesar pairing approve telegram XKGH5N7P
 
 # Other pairing commands:
-hermes pairing list          # View pending + approved users
-hermes pairing revoke telegram 123456789  # Remove access
+caesar pairing list          # View pending + approved users
+caesar pairing revoke telegram 123456789  # Remove access
 ```
 
 Pairing codes expire after 1 hour, are rate-limited, and use cryptographic randomness.
@@ -205,7 +205,7 @@ Send any message while the agent is working to interrupt it. Key behaviors:
 
 ## Tool Progress Notifications
 
-Control how much tool activity is displayed in `~/.hermes/config.yaml`:
+Control how much tool activity is displayed in `~/.caesar/config.yaml`:
 
 ```yaml
 display:
@@ -230,7 +230,7 @@ Run a prompt in a separate background session so the agent works on it independe
 /background Check all servers in the cluster and report any that are down
 ```
 
-Hermes confirms immediately:
+Caesar confirms immediately:
 
 ```
 🔄 Background task started: "Check all servers in the cluster..."
@@ -248,7 +248,7 @@ Each `/background` prompt spawns a **separate agent instance** that runs asynchr
 
 ### Background Process Notifications
 
-When the agent running a background session uses `terminal(background=true)` to start long-running processes (servers, builds, etc.), the gateway can push status updates to your chat. Control this with `display.background_process_notifications` in `~/.hermes/config.yaml`:
+When the agent running a background session uses `terminal(background=true)` to start long-running processes (servers, builds, etc.), the gateway can push status updates to your chat. Control this with `display.background_process_notifications` in `~/.caesar/config.yaml`:
 
 ```yaml
 display:
@@ -265,7 +265,7 @@ display:
 You can also set this via environment variable:
 
 ```bash
-HERMES_BACKGROUND_NOTIFICATIONS=result
+CAESAR_BACKGROUND_NOTIFICATIONS=result
 ```
 
 ### Use Cases
@@ -284,52 +284,52 @@ Background tasks on messaging platforms are fire-and-forget — you don't need t
 ### Linux (systemd)
 
 ```bash
-hermes gateway install               # Install as user service
-hermes gateway start                 # Start the service
-hermes gateway stop                  # Stop the service
-hermes gateway status                # Check status
-journalctl --user -u hermes-gateway -f  # View logs
+caesar gateway install               # Install as user service
+caesar gateway start                 # Start the service
+caesar gateway stop                  # Stop the service
+caesar gateway status                # Check status
+journalctl --user -u caesar-gateway -f  # View logs
 
 # Enable lingering (keeps running after logout)
 sudo loginctl enable-linger $USER
 
 # Or install a boot-time system service that still runs as your user
-sudo hermes gateway install --system
-sudo hermes gateway start --system
-sudo hermes gateway status --system
-journalctl -u hermes-gateway -f
+sudo caesar gateway install --system
+sudo caesar gateway start --system
+sudo caesar gateway status --system
+journalctl -u caesar-gateway -f
 ```
 
 Use the user service on laptops and dev boxes. Use the system service on VPS or headless hosts that should come back at boot without relying on systemd linger.
 
-Avoid keeping both the user and system gateway units installed at once unless you really mean to. Hermes will warn if it detects both because start/stop/status behavior gets ambiguous.
+Avoid keeping both the user and system gateway units installed at once unless you really mean to. Caesar will warn if it detects both because start/stop/status behavior gets ambiguous.
 
 :::info Multiple installations
-If you run multiple Hermes installations on the same machine (with different `HERMES_HOME` directories), each gets its own systemd service name. The default `~/.hermes` uses `hermes-gateway`; other installations use `hermes-gateway-<hash>`. The `hermes gateway` commands automatically target the correct service for your current `HERMES_HOME`.
+If you run multiple Caesar installations on the same machine (with different `CAESAR_HOME` directories), each gets its own systemd service name. The default `~/.caesar` uses `caesar-gateway`; other installations use `caesar-gateway-<hash>`. The `caesar gateway` commands automatically target the correct service for your current `CAESAR_HOME`.
 :::
 
 ### macOS (launchd)
 
 ```bash
-hermes gateway install               # Install as launchd agent
-hermes gateway start                 # Start the service
-hermes gateway stop                  # Stop the service
-hermes gateway status                # Check status
-tail -f ~/.hermes/logs/gateway.log   # View logs
+caesar gateway install               # Install as launchd agent
+caesar gateway start                 # Start the service
+caesar gateway stop                  # Stop the service
+caesar gateway status                # Check status
+tail -f ~/.caesar/logs/gateway.log   # View logs
 ```
 
-The generated plist lives at `~/Library/LaunchAgents/ai.hermes.gateway.plist`. It includes three environment variables:
+The generated plist lives at `~/Library/LaunchAgents/ai.caesar.gateway.plist`. It includes three environment variables:
 
 - **PATH** — your full shell PATH at install time, with the venv `bin/` and `node_modules/.bin` prepended. This ensures user-installed tools (Node.js, ffmpeg, etc.) are available to gateway subprocesses like the WhatsApp bridge.
 - **VIRTUAL_ENV** — points to the Python virtualenv so tools can resolve packages correctly.
-- **HERMES_HOME** — scopes the gateway to your Hermes installation.
+- **CAESAR_HOME** — scopes the gateway to your Caesar installation.
 
 :::tip PATH changes after install
-launchd plists are static — if you install new tools (e.g. a new Node.js version via nvm, or ffmpeg via Homebrew) after setting up the gateway, run `hermes gateway install` again to capture the updated PATH. The gateway will detect the stale plist and reload automatically.
+launchd plists are static — if you install new tools (e.g. a new Node.js version via nvm, or ffmpeg via Homebrew) after setting up the gateway, run `caesar gateway install` again to capture the updated PATH. The gateway will detect the stale plist and reload automatically.
 :::
 
 :::info Multiple installations
-Like the Linux systemd service, each `HERMES_HOME` directory gets its own launchd label. The default `~/.hermes` uses `ai.hermes.gateway`; other installations use `ai.hermes.gateway-<suffix>`.
+Like the Linux systemd service, each `CAESAR_HOME` directory gets its own launchd label. The default `~/.caesar` uses `ai.caesar.gateway`; other installations use `ai.caesar.gateway-<suffix>`.
 :::
 
 ## Platform-Specific Toolsets
@@ -338,22 +338,22 @@ Each platform has its own toolset:
 
 | Platform | Toolset | Capabilities |
 |----------|---------|--------------|
-| CLI | `hermes-cli` | Full access |
-| Telegram | `hermes-telegram` | Full tools including terminal |
-| Discord | `hermes-discord` | Full tools including terminal |
-| WhatsApp | `hermes-whatsapp` | Full tools including terminal |
-| Slack | `hermes-slack` | Full tools including terminal |
-| Signal | `hermes-signal` | Full tools including terminal |
-| SMS | `hermes-sms` | Full tools including terminal |
-| Email | `hermes-email` | Full tools including terminal |
-| Home Assistant | `hermes-homeassistant` | Full tools + HA device control (ha_list_entities, ha_get_state, ha_call_service, ha_list_services) |
-| Mattermost | `hermes-mattermost` | Full tools including terminal |
-| Matrix | `hermes-matrix` | Full tools including terminal |
-| DingTalk | `hermes-dingtalk` | Full tools including terminal |
-| Feishu/Lark | `hermes-feishu` | Full tools including terminal |
-| WeCom | `hermes-wecom` | Full tools including terminal |
-| API Server | `hermes` (default) | Full tools including terminal |
-| Webhooks | `hermes-webhook` | Full tools including terminal |
+| CLI | `caesar-cli` | Full access |
+| Telegram | `caesar-telegram` | Full tools including terminal |
+| Discord | `caesar-discord` | Full tools including terminal |
+| WhatsApp | `caesar-whatsapp` | Full tools including terminal |
+| Slack | `caesar-slack` | Full tools including terminal |
+| Signal | `caesar-signal` | Full tools including terminal |
+| SMS | `caesar-sms` | Full tools including terminal |
+| Email | `caesar-email` | Full tools including terminal |
+| Home Assistant | `caesar-homeassistant` | Full tools + HA device control (ha_list_entities, ha_get_state, ha_call_service, ha_list_services) |
+| Mattermost | `caesar-mattermost` | Full tools including terminal |
+| Matrix | `caesar-matrix` | Full tools including terminal |
+| DingTalk | `caesar-dingtalk` | Full tools including terminal |
+| Feishu/Lark | `caesar-feishu` | Full tools including terminal |
+| WeCom | `caesar-wecom` | Full tools including terminal |
+| API Server | `caesar` (default) | Full tools including terminal |
+| Webhooks | `caesar-webhook` | Full tools including terminal |
 
 ## Next Steps
 

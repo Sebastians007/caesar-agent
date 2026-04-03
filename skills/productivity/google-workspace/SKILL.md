@@ -1,8 +1,8 @@
 ---
 name: google-workspace
-description: Gmail, Calendar, Drive, Contacts, Sheets, and Docs integration via Python. Uses OAuth2 with automatic token refresh. No external binaries needed — runs entirely with Google's Python client libraries in the Hermes venv.
+description: Gmail, Calendar, Drive, Contacts, Sheets, and Docs integration via Python. Uses OAuth2 with automatic token refresh. No external binaries needed — runs entirely with Google's Python client libraries in the Caesar venv.
 version: 1.0.0
-author: Nous Research
+author: Sebastian Sartele
 license: MIT
 required_credential_files:
   - path: google_token.json
@@ -10,9 +10,9 @@ required_credential_files:
   - path: google_client_secret.json
     description: Google OAuth2 client credentials (downloaded from Google Cloud Console)
 metadata:
-  hermes:
+  caesar:
     tags: [Google, Gmail, Calendar, Drive, Sheets, Docs, Contacts, Email, OAuth]
-    homepage: https://github.com/NousResearch/hermes-agent
+    homepage: https://github.com/Sebastians007/caesar-agent
     related_skills: [himalaya]
 ---
 
@@ -37,7 +37,7 @@ on CLI, Telegram, Discord, or any platform.
 Define a shorthand first:
 
 ```bash
-GSETUP="python ~/.hermes/skills/productivity/google-workspace/scripts/setup.py"
+GSETUP="python ~/.caesar/skills/productivity/google-workspace/scripts/setup.py"
 ```
 
 ### Step 0: Check if already set up
@@ -125,8 +125,8 @@ Should print `AUTHENTICATED`. Setup is complete — token refreshes automaticall
 
 ### Notes
 
-- Token is stored at `~/.hermes/google_token.json` and auto-refreshes.
-- Pending OAuth session state/verifier are stored temporarily at `~/.hermes/google_oauth_pending.json` until exchange completes.
+- Token is stored at `~/.caesar/google_token.json` and auto-refreshes.
+- Pending OAuth session state/verifier are stored temporarily at `~/.caesar/google_oauth_pending.json` until exchange completes.
 - To revoke: `$GSETUP --revoke`
 
 ## Usage
@@ -134,7 +134,7 @@ Should print `AUTHENTICATED`. Setup is complete — token refreshes automaticall
 All commands go through the API script. Set `GAPI` as a shorthand:
 
 ```bash
-GAPI="python ~/.hermes/skills/productivity/google-workspace/scripts/google_api.py"
+GAPI="python ~/.caesar/skills/productivity/google-workspace/scripts/google_api.py"
 ```
 
 ### Gmail

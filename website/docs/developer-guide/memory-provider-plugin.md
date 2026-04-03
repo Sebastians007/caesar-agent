@@ -1,12 +1,12 @@
 ---
 sidebar_position: 8
 title: "Memory Provider Plugins"
-description: "How to build a memory provider plugin for Hermes Agent"
+description: "How to build a memory provider plugin for Caesar Agent"
 ---
 
 # Building a Memory Provider Plugin
 
-Memory provider plugins give Hermes Agent persistent, cross-session knowledge beyond the built-in MEMORY.md and USER.md. This guide covers how to build one.
+Memory provider plugins give Caesar Agent persistent, cross-session knowledge beyond the built-in MEMORY.md and USER.md. This guide covers how to build one.
 
 ## Directory Structure
 
@@ -39,7 +39,7 @@ class MyMemoryProvider(MemoryProvider):
         """Called once at agent startup.
 
         kwargs always includes:
-          hermes_home (str): Active HERMES_HOME path. Use for storage.
+          caesar_home (str): Active CAESAR_HOME path. Use for storage.
         """
         self._api_key = os.environ.get("MY_API_KEY", "")
         self._session_id = session_id
@@ -63,8 +63,8 @@ class MyMemoryProvider(MemoryProvider):
 
 | Method | Purpose | Must Implement? |
 |--------|---------|-----------------|
-| `get_config_schema()` | Declare config fields for `hermes memory setup` | **Yes** |
-| `save_config(values, hermes_home)` | Write non-secret config to native location | **Yes** (unless env-var-only) |
+| `get_config_schema()` | Declare config fields for `caesar memory setup` | **Yes** |
+| `save_config(values, caesar_home)` | Write non-secret config to native location | **Yes** (unless env-var-only) |
 
 ### Optional Hooks
 
@@ -81,7 +81,7 @@ class MyMemoryProvider(MemoryProvider):
 
 ## Config Schema
 
-`get_config_schema()` returns a list of field descriptors used by `hermes memory setup`:
+`get_config_schema()` returns a list of field descriptors used by `caesar memory setup`:
 
 ```python
 def get_config_schema(self):
@@ -103,7 +103,7 @@ def get_config_schema(self):
         {
             "key": "project",
             "description": "Project identifier",
-            "default": "hermes",
+            "default": "caesar",
         },
     ]
 ```
@@ -113,11 +113,11 @@ Fields with `secret: True` and `env_var` go to `.env`. Non-secret fields are pas
 ## Save Config
 
 ```python
-def save_config(self, values: dict, hermes_home: str) -> None:
+def save_config(self, values: dict, caesar_home: str) -> None:
     """Write non-secret config to your native location."""
     import json
     from pathlib import Path
-    config_path = Path(hermes_home) / "my-provider.json"
+    config_path = Path(caesar_home) / "my-provider.json"
     config_path.write_text(json.dumps(values, indent=2))
 ```
 
@@ -161,15 +161,15 @@ def sync_turn(self, user_content, assistant_content):
 
 ## Profile Isolation
 
-All storage paths **must** use the `hermes_home` kwarg from `initialize()`, not hardcoded `~/.hermes`:
+All storage paths **must** use the `caesar_home` kwarg from `initialize()`, not hardcoded `~/.caesar`:
 
 ```python
 # CORRECT — profile-scoped
-from hermes_constants import get_hermes_home
-data_dir = get_hermes_home() / "my-provider"
+from caesar_constants import get_caesar_home
+data_dir = get_caesar_home() / "my-provider"
 
 # WRONG — shared across all profiles
-data_dir = Path("~/.hermes/my-provider").expanduser()
+data_dir = Path("~/.caesar/my-provider").expanduser()
 ```
 
 ## Testing

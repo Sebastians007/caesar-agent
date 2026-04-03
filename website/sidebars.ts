@@ -16,7 +16,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Using Hermes',
+      label: 'Using Caesar',
       collapsed: true,
       items: [
         'user-guide/cli',
@@ -132,13 +132,13 @@ const sidebars: SidebarsConfig = {
       collapsed: true,
       items: [
         'guides/tips',
-        'guides/build-a-hermes-plugin',
+        'guides/build-a-caesar-plugin',
         'guides/daily-briefing-bot',
         'guides/team-telegram-assistant',
         'guides/python-library',
-        'guides/use-mcp-with-hermes',
-        'guides/use-soul-with-hermes',
-        'guides/use-voice-mode-with-hermes',
+        'guides/use-mcp-with-caesar',
+        'guides/use-soul-with-caesar',
+        'guides/use-voice-mode-with-caesar',
         'guides/migrate-from-openclaw',
       ],
     },

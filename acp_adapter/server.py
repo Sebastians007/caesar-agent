@@ -1,4 +1,4 @@
-"""ACP agent server — exposes Hermes Agent via the Agent Client Protocol."""
+"""ACP agent server — exposes Caesar Agent via the Agent Client Protocol."""
 
 from __future__ import annotations
 
@@ -53,9 +53,9 @@ from acp_adapter.session import SessionManager, SessionState
 logger = logging.getLogger(__name__)
 
 try:
-    from hermes_cli import __version__ as HERMES_VERSION
+    from caesar_cli import __version__ as CAESAR_VERSION
 except Exception:
-    HERMES_VERSION = "0.0.0"
+    CAESAR_VERSION = "0.0.0"
 
 # Thread pool for running AIAgent (synchronous) in parallel.
 _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="acp-agent")
@@ -81,8 +81,8 @@ def _extract_text(
     return "\n".join(parts)
 
 
-class HermesACPAgent(acp.Agent):
-    """ACP Agent implementation wrapping Hermes AIAgent."""
+class CaesarACPAgent(acp.Agent):
+    """ACP Agent implementation wrapping Caesar AIAgent."""
 
     def __init__(self, session_manager: SessionManager | None = None):
         super().__init__()
@@ -136,7 +136,7 @@ class HermesACPAgent(acp.Agent):
         try:
             from model_tools import get_tool_definitions
 
-            enabled_toolsets = getattr(state.agent, "enabled_toolsets", None) or ["hermes-acp"]
+            enabled_toolsets = getattr(state.agent, "enabled_toolsets", None) or ["caesar-acp"]
             disabled_toolsets = getattr(state.agent, "disabled_toolsets", None)
             state.agent.tools = get_tool_definitions(
                 enabled_toolsets=enabled_toolsets,
@@ -180,7 +180,7 @@ class HermesACPAgent(acp.Agent):
                 AuthMethod(
                     id=provider,
                     name=f"{provider} runtime credentials",
-                    description=f"Authenticate Hermes using the currently configured {provider} runtime credentials.",
+                    description=f"Authenticate Caesar using the currently configured {provider} runtime credentials.",
                 )
             ]
 
@@ -193,7 +193,7 @@ class HermesACPAgent(acp.Agent):
 
         return InitializeResponse(
             protocol_version=acp.PROTOCOL_VERSION,
-            agent_info=Implementation(name="hermes-agent", version=HERMES_VERSION),
+            agent_info=Implementation(name="caesar-agent", version=CAESAR_VERSION),
             agent_capabilities=AgentCapabilities(
                 session_capabilities=SessionCapabilities(
                     fork=SessionForkCapabilities(),
@@ -303,7 +303,7 @@ class HermesACPAgent(acp.Agent):
         session_id: str,
         **kwargs: Any,
     ) -> PromptResponse:
-        """Run Hermes on the user's prompt and stream events back to the editor."""
+        """Run Caesar on the user's prompt and stream events back to the editor."""
         state = self.session_manager.get_session(session_id)
         if state is None:
             logger.error("prompt: session %s not found", session_id)
@@ -418,7 +418,7 @@ class HermesACPAgent(acp.Agent):
         "context": "Show conversation context info",
         "reset": "Clear conversation history",
         "compact": "Compress conversation context",
-        "version": "Show Hermes version",
+        "version": "Show Caesar version",
     }
 
     def _handle_slash_command(self, text: str, state: SessionState) -> str | None:
@@ -470,7 +470,7 @@ class HermesACPAgent(acp.Agent):
 
         # Auto-detect provider for the requested model
         try:
-            from hermes_cli.models import parse_model_input, detect_provider_for_model
+            from caesar_cli.models import parse_model_input, detect_provider_for_model
             target_provider, new_model = parse_model_input(new_model, current_provider)
             if target_provider == current_provider:
                 detected = detect_provider_for_model(new_model, current_provider)
@@ -494,7 +494,7 @@ class HermesACPAgent(acp.Agent):
     def _cmd_tools(self, args: str, state: SessionState) -> str:
         try:
             from model_tools import get_tool_definitions
-            toolsets = getattr(state.agent, "enabled_toolsets", None) or ["hermes-acp"]
+            toolsets = getattr(state.agent, "enabled_toolsets", None) or ["caesar-acp"]
             tools = get_tool_definitions(enabled_toolsets=toolsets, quiet_mode=True)
             if not tools:
                 return "No tools available."
@@ -548,7 +548,7 @@ class HermesACPAgent(acp.Agent):
             return f"Compression failed: {e}"
 
     def _cmd_version(self, args: str, state: SessionState) -> str:
-        return f"Hermes Agent v{HERMES_VERSION}"
+        return f"Caesar Agent v{CAESAR_VERSION}"
 
     # ---- Model switching (ACP protocol method) -------------------------------
 
@@ -592,7 +592,7 @@ class HermesACPAgent(acp.Agent):
     async def set_config_option(
         self, config_id: str, session_id: str, value: str, **kwargs: Any
     ) -> SetSessionConfigOptionResponse | None:
-        """Accept ACP config option updates even when Hermes has no typed ACP config surface yet."""
+        """Accept ACP config option updates even when Caesar has no typed ACP config surface yet."""
         state = self.session_manager.get_session(session_id)
         if state is None:
             logger.warning("Session %s: config update requested for missing session", session_id)

@@ -8,7 +8,7 @@ Original PR #2732 by Alinxus, adapted to MemoryProvider ABC.
 Config via environment variables:
   RETAINDB_API_KEY    — API key (required)
   RETAINDB_BASE_URL   — API endpoint (default: https://api.retaindb.com)
-  RETAINDB_PROJECT    — Project identifier (default: hermes)
+  RETAINDB_PROJECT    — Project identifier (default: caesar)
 """
 
 from __future__ import annotations
@@ -108,7 +108,7 @@ class RetainDBMemoryProvider(MemoryProvider):
     def __init__(self):
         self._api_key = ""
         self._base_url = _DEFAULT_BASE_URL
-        self._project = "hermes"
+        self._project = "caesar"
         self._user_id = ""
         self._prefetch_result = ""
         self._prefetch_lock = threading.Lock()
@@ -126,7 +126,7 @@ class RetainDBMemoryProvider(MemoryProvider):
         return [
             {"key": "api_key", "description": "RetainDB API key", "secret": True, "required": True, "env_var": "RETAINDB_API_KEY", "url": "https://retaindb.com"},
             {"key": "base_url", "description": "API endpoint", "default": "https://api.retaindb.com"},
-            {"key": "project", "description": "Project identifier", "default": "hermes"},
+            {"key": "project", "description": "Project identifier", "default": "caesar"},
         ]
 
     def _headers(self) -> dict:
@@ -155,13 +155,13 @@ class RetainDBMemoryProvider(MemoryProvider):
         if explicit_project:
             self._project = explicit_project
         else:
-            hermes_home = kwargs.get("hermes_home", "")
-            profile_name = os.path.basename(hermes_home) if hermes_home else ""
-            # Default profile (~/.hermes) → "hermes"; named profiles → "hermes-<name>"
-            if profile_name and profile_name != ".hermes":
-                self._project = f"hermes-{profile_name}"
+            caesar_home = kwargs.get("caesar_home", "")
+            profile_name = os.path.basename(caesar_home) if caesar_home else ""
+            # Default profile (~/.caesar) → "caesar"; named profiles → "caesar-<name>"
+            if profile_name and profile_name != ".caesar":
+                self._project = f"caesar-{profile_name}"
             else:
-                self._project = "hermes"
+                self._project = "caesar"
 
     def system_prompt_block(self) -> str:
         return (

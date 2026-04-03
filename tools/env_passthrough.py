@@ -53,8 +53,8 @@ def _load_config_passthrough() -> frozenset[str]:
 
     result: set[str] = set()
     try:
-        hermes_home = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
-        config_path = hermes_home / "config.yaml"
+        caesar_home = Path(os.environ.get("CAESAR_HOME", Path.home() / ".caesar"))
+        config_path = caesar_home / "config.yaml"
         if config_path.exists():
             import yaml
 

@@ -6,17 +6,17 @@ description: "External memory provider plugins — Honcho, OpenViking, Mem0, Hin
 
 # Memory Providers
 
-Hermes Agent ships with 7 external memory provider plugins that give the agent persistent, cross-session knowledge beyond the built-in MEMORY.md and USER.md. Only **one** external provider can be active at a time — the built-in memory is always active alongside it.
+Caesar Agent ships with 7 external memory provider plugins that give the agent persistent, cross-session knowledge beyond the built-in MEMORY.md and USER.md. Only **one** external provider can be active at a time — the built-in memory is always active alongside it.
 
 ## Quick Start
 
 ```bash
-hermes memory setup      # interactive picker + configuration
-hermes memory status     # check what's active
-hermes memory off        # disable external provider
+caesar memory setup      # interactive picker + configuration
+caesar memory status     # check what's active
+caesar memory off        # disable external provider
 ```
 
-Or set manually in `~/.hermes/config.yaml`:
+Or set manually in `~/.caesar/config.yaml`:
 
 ```yaml
 memory:
@@ -25,7 +25,7 @@ memory:
 
 ## How It Works
 
-When a memory provider is active, Hermes automatically:
+When a memory provider is active, Caesar automatically:
 
 1. **Injects provider context** into the system prompt (what the provider knows)
 2. **Prefetches relevant memories** before each turn (background, non-blocking)
@@ -53,16 +53,16 @@ AI-native cross-session user modeling with dialectic Q&A, semantic search, and p
 
 **Setup:**
 ```bash
-hermes memory setup    # select "honcho"
+caesar memory setup    # select "honcho"
 # Or manually:
-hermes config set memory.provider honcho
-echo "HONCHO_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider honcho
+echo "HONCHO_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
-**Config:** `$HERMES_HOME/honcho.json` — existing Honcho users' configuration and data are fully preserved.
+**Config:** `$CAESAR_HOME/honcho.json` — existing Honcho users' configuration and data are fully preserved.
 
-:::tip Migrating from `hermes honcho`
-If you previously used `hermes honcho setup`, your config and all server-side data are intact. Just set `memory.provider: honcho` to reactivate via the new system.
+:::tip Migrating from `caesar honcho`
+If you previously used `caesar honcho setup`, your config and all server-side data are intact. Just set `memory.provider: honcho` to reactivate via the new system.
 :::
 
 ---
@@ -86,11 +86,11 @@ Context database by Volcengine (ByteDance) with filesystem-style knowledge hiera
 pip install openviking
 openviking-server
 
-# Then configure Hermes
-hermes memory setup    # select "openviking"
+# Then configure Caesar
+caesar memory setup    # select "openviking"
 # Or manually:
-hermes config set memory.provider openviking
-echo "OPENVIKING_ENDPOINT=http://localhost:1933" >> ~/.hermes/.env
+caesar config set memory.provider openviking
+echo "OPENVIKING_ENDPOINT=http://localhost:1933" >> ~/.caesar/.env
 ```
 
 **Key features:**
@@ -115,18 +115,18 @@ Server-side LLM fact extraction with semantic search, reranking, and automatic d
 
 **Setup:**
 ```bash
-hermes memory setup    # select "mem0"
+caesar memory setup    # select "mem0"
 # Or manually:
-hermes config set memory.provider mem0
-echo "MEM0_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider mem0
+echo "MEM0_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
-**Config:** `$HERMES_HOME/mem0.json`
+**Config:** `$CAESAR_HOME/mem0.json`
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `user_id` | `hermes-user` | User identifier |
-| `agent_id` | `hermes` | Agent identifier |
+| `user_id` | `caesar-user` | User identifier |
+| `agent_id` | `caesar` | Agent identifier |
 
 ---
 
@@ -145,18 +145,18 @@ Long-term memory with knowledge graph, entity resolution, and multi-strategy ret
 
 **Setup:**
 ```bash
-hermes memory setup    # select "hindsight"
+caesar memory setup    # select "hindsight"
 # Or manually:
-hermes config set memory.provider hindsight
-echo "HINDSIGHT_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider hindsight
+echo "HINDSIGHT_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
-**Config:** `$HERMES_HOME/hindsight/config.json`
+**Config:** `$CAESAR_HOME/hindsight/config.json`
 
 | Key | Default | Description |
 |-----|---------|-------------|
 | `mode` | `cloud` | `cloud` or `local` |
-| `bank_id` | `hermes` | Memory bank identifier |
+| `bank_id` | `caesar` | Memory bank identifier |
 | `budget` | `mid` | Recall thoroughness: `low` / `mid` / `high` |
 
 ---
@@ -176,16 +176,16 @@ Local SQLite fact store with FTS5 full-text search, trust scoring, and HRR (Holo
 
 **Setup:**
 ```bash
-hermes memory setup    # select "holographic"
+caesar memory setup    # select "holographic"
 # Or manually:
-hermes config set memory.provider holographic
+caesar config set memory.provider holographic
 ```
 
-**Config:** `config.yaml` under `plugins.hermes-memory-store`
+**Config:** `config.yaml` under `plugins.caesar-memory-store`
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `db_path` | `$HERMES_HOME/memory_store.db` | SQLite database path |
+| `db_path` | `$CAESAR_HOME/memory_store.db` | SQLite database path |
 | `auto_extract` | `false` | Auto-extract facts at session end |
 | `default_trust` | `0.5` | Default trust score (0.0–1.0) |
 
@@ -212,10 +212,10 @@ Cloud memory API with hybrid search (Vector + BM25 + Reranking), 7 memory types,
 
 **Setup:**
 ```bash
-hermes memory setup    # select "retaindb"
+caesar memory setup    # select "retaindb"
 # Or manually:
-hermes config set memory.provider retaindb
-echo "RETAINDB_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider retaindb
+echo "RETAINDB_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
 ---
@@ -238,15 +238,15 @@ Persistent memory via the `brv` CLI — hierarchical knowledge tree with tiered 
 # Install the CLI first
 curl -fsSL https://byterover.dev/install.sh | sh
 
-# Then configure Hermes
-hermes memory setup    # select "byterover"
+# Then configure Caesar
+caesar memory setup    # select "byterover"
 # Or manually:
-hermes config set memory.provider byterover
+caesar config set memory.provider byterover
 ```
 
 **Key features:**
 - Automatic pre-compression extraction (saves insights before context compression discards them)
-- Knowledge tree stored at `$HERMES_HOME/byterover/` (profile-scoped)
+- Knowledge tree stored at `$CAESAR_HOME/byterover/` (profile-scoped)
 - SOC2 Type II certified cloud sync (optional)
 
 ---
@@ -267,8 +267,8 @@ hermes config set memory.provider byterover
 
 Each provider's data is isolated per [profile](/docs/user-guide/profiles):
 
-- **Local storage providers** (Holographic, ByteRover) use `$HERMES_HOME/` paths which differ per profile
-- **Config file providers** (Honcho, Mem0, Hindsight) store config in `$HERMES_HOME/` so each profile has its own credentials
+- **Local storage providers** (Holographic, ByteRover) use `$CAESAR_HOME/` paths which differ per profile
+- **Config file providers** (Honcho, Mem0, Hindsight) store config in `$CAESAR_HOME/` so each profile has its own credentials
 - **Cloud providers** (RetainDB) auto-derive profile-scoped project names
 - **Env var providers** (OpenViking) are configured via each profile's `.env` file
 

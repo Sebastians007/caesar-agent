@@ -7,10 +7,10 @@ Original PR #2933 by kartik-mem0, adapted to MemoryProvider ABC.
 
 Config via environment variables:
   MEM0_API_KEY       — Mem0 Platform API key (required)
-  MEM0_USER_ID       — User identifier (default: hermes-user)
-  MEM0_AGENT_ID      — Agent identifier (default: hermes)
+  MEM0_USER_ID       — User identifier (default: caesar-user)
+  MEM0_AGENT_ID      — Agent identifier (default: caesar)
 
-Or via $HERMES_HOME/mem0.json.
+Or via $CAESAR_HOME/mem0.json.
 """
 
 from __future__ import annotations
@@ -38,9 +38,9 @@ _BREAKER_COOLDOWN_SECS = 120
 # ---------------------------------------------------------------------------
 
 def _load_config() -> dict:
-    """Load config from $HERMES_HOME/mem0.json or env vars."""
-    from hermes_constants import get_hermes_home
-    config_path = get_hermes_home() / "mem0.json"
+    """Load config from $CAESAR_HOME/mem0.json or env vars."""
+    from caesar_constants import get_caesar_home
+    config_path = get_caesar_home() / "mem0.json"
 
     if config_path.exists():
         try:
@@ -50,8 +50,8 @@ def _load_config() -> dict:
 
     return {
         "api_key": os.environ.get("MEM0_API_KEY", ""),
-        "user_id": os.environ.get("MEM0_USER_ID", "hermes-user"),
-        "agent_id": os.environ.get("MEM0_AGENT_ID", "hermes"),
+        "user_id": os.environ.get("MEM0_USER_ID", "caesar-user"),
+        "agent_id": os.environ.get("MEM0_AGENT_ID", "caesar"),
         "rerank": True,
         "keyword_search": False,
     }
@@ -115,8 +115,8 @@ class Mem0MemoryProvider(MemoryProvider):
         self._client = None
         self._client_lock = threading.Lock()
         self._api_key = ""
-        self._user_id = "hermes-user"
-        self._agent_id = "hermes"
+        self._user_id = "caesar-user"
+        self._agent_id = "caesar"
         self._rerank = True
         self._prefetch_result = ""
         self._prefetch_lock = threading.Lock()
@@ -134,11 +134,11 @@ class Mem0MemoryProvider(MemoryProvider):
         cfg = _load_config()
         return bool(cfg.get("api_key"))
 
-    def save_config(self, values, hermes_home):
-        """Write config to $HERMES_HOME/mem0.json."""
+    def save_config(self, values, caesar_home):
+        """Write config to $CAESAR_HOME/mem0.json."""
         import json
         from pathlib import Path
-        config_path = Path(hermes_home) / "mem0.json"
+        config_path = Path(caesar_home) / "mem0.json"
         existing = {}
         if config_path.exists():
             try:
@@ -151,8 +151,8 @@ class Mem0MemoryProvider(MemoryProvider):
     def get_config_schema(self):
         return [
             {"key": "api_key", "description": "Mem0 Platform API key", "secret": True, "required": True, "env_var": "MEM0_API_KEY", "url": "https://app.mem0.ai"},
-            {"key": "user_id", "description": "User identifier", "default": "hermes-user"},
-            {"key": "agent_id", "description": "Agent identifier", "default": "hermes"},
+            {"key": "user_id", "description": "User identifier", "default": "caesar-user"},
+            {"key": "agent_id", "description": "Agent identifier", "default": "caesar"},
             {"key": "rerank", "description": "Enable reranking for recall", "default": "true", "choices": ["true", "false"]},
         ]
 
@@ -194,8 +194,8 @@ class Mem0MemoryProvider(MemoryProvider):
     def initialize(self, session_id: str, **kwargs) -> None:
         self._config = _load_config()
         self._api_key = self._config.get("api_key", "")
-        self._user_id = self._config.get("user_id", "hermes-user")
-        self._agent_id = self._config.get("agent_id", "hermes")
+        self._user_id = self._config.get("user_id", "caesar-user")
+        self._agent_id = self._config.get("agent_id", "caesar")
         self._rerank = self._config.get("rerank", True)
 
     def system_prompt_block(self) -> str:

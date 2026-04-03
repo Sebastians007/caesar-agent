@@ -1,5 +1,5 @@
 """
-Hermes MCP Server — expose messaging conversations as MCP tools.
+Caesar MCP Server — expose messaging conversations as MCP tools.
 
 Starts a stdio MCP server that lets any MCP client (Claude Code, Cursor, Codex,
 etc.) list conversations, read message history, send messages, poll for live
@@ -10,17 +10,17 @@ Matches OpenClaw's 9-tool MCP channel bridge surface:
   events_poll, events_wait, messages_send, permissions_list_open,
   permissions_respond
 
-Plus: channels_list (Hermes-specific extra)
+Plus: channels_list (Caesar-specific extra)
 
 Usage:
-    hermes mcp serve
-    hermes mcp serve --verbose
+    caesar mcp serve
+    caesar mcp serve --verbose
 
 MCP client config (e.g. claude_desktop_config.json):
     {
         "mcpServers": {
-            "hermes": {
-                "command": "hermes",
+            "caesar": {
+                "command": "caesar",
                 "args": ["mcp", "serve"]
             }
         }
@@ -41,7 +41,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger("hermes.mcp_serve")
+logger = logging.getLogger("caesar.mcp_serve")
 
 # ---------------------------------------------------------------------------
 # Lazy MCP SDK import
@@ -61,18 +61,18 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 def _get_sessions_dir() -> Path:
-    """Return the sessions directory using HERMES_HOME."""
+    """Return the sessions directory using CAESAR_HOME."""
     try:
-        from hermes_constants import get_hermes_home
-        return get_hermes_home() / "sessions"
+        from caesar_constants import get_caesar_home
+        return get_caesar_home() / "sessions"
     except ImportError:
-        return Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes")) / "sessions"
+        return Path(os.environ.get("CAESAR_HOME", Path.home() / ".caesar")) / "sessions"
 
 
 def _get_session_db():
     """Get a SessionDB instance for reading message transcripts."""
     try:
-        from hermes_state import SessionDB
+        from caesar_state import SessionDB
         return SessionDB()
     except Exception as e:
         logger.debug("SessionDB unavailable: %s", e)
@@ -99,11 +99,11 @@ def _load_sessions_index() -> dict:
 def _load_channel_directory() -> dict:
     """Load the cached channel directory for available targets."""
     try:
-        from hermes_constants import get_hermes_home
-        directory_file = get_hermes_home() / "channel_directory.json"
+        from caesar_constants import get_caesar_home
+        directory_file = get_caesar_home() / "channel_directory.json"
     except ImportError:
         directory_file = Path(
-            os.environ.get("HERMES_HOME", Path.home() / ".hermes")
+            os.environ.get("CAESAR_HOME", Path.home() / ".caesar")
         ) / "channel_directory.json"
 
     if not directory_file.exists():
@@ -187,7 +187,7 @@ class EventBridge:
     """Background poller that watches SessionDB for new messages and
     maintains an in-memory event queue with waiter support.
 
-    This is the Hermes equivalent of OpenClaw's WebSocket gateway bridge.
+    This is the Caesar equivalent of OpenClaw's WebSocket gateway bridge.
     Instead of WebSocket events, we poll the SQLite database for changes.
     """
 
@@ -344,10 +344,10 @@ class EventBridge:
 
         # Check if state.db has changed
         try:
-            from hermes_constants import get_hermes_home
-            db_file = get_hermes_home() / "state.db"
+            from caesar_constants import get_caesar_home
+            db_file = get_caesar_home() / "state.db"
         except ImportError:
-            db_file = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes")) / "state.db"
+            db_file = Path(os.environ.get("CAESAR_HOME", Path.home() / ".caesar")) / "state.db"
 
         try:
             db_mtime = db_file.stat().st_mtime if db_file.exists() else 0.0
@@ -430,17 +430,17 @@ class EventBridge:
 # ---------------------------------------------------------------------------
 
 def create_mcp_server(event_bridge: Optional[EventBridge] = None) -> "FastMCP":
-    """Create and return the Hermes MCP server with all tools registered."""
+    """Create and return the Caesar MCP server with all tools registered."""
     if not _MCP_SERVER_AVAILABLE:
         raise ImportError(
             "MCP server requires the 'mcp' package. "
-            "Install with: pip install 'hermes-agent[mcp]'"
+            "Install with: pip install 'caesar-agent[mcp]'"
         )
 
     mcp = FastMCP(
-        "hermes",
+        "caesar",
         instructions=(
-            "Hermes Agent messaging bridge. Use these tools to interact with "
+            "Caesar Agent messaging bridge. Use these tools to interact with "
             "conversations across Telegram, Discord, Slack, WhatsApp, Signal, "
             "Matrix, and other connected platforms."
         ),
@@ -835,11 +835,11 @@ def create_mcp_server(event_bridge: Optional[EventBridge] = None) -> "FastMCP":
 # ---------------------------------------------------------------------------
 
 def run_mcp_server(verbose: bool = False) -> None:
-    """Start the Hermes MCP server on stdio."""
+    """Start the Caesar MCP server on stdio."""
     if not _MCP_SERVER_AVAILABLE:
         print(
             "Error: MCP server requires the 'mcp' package.\n"
-            "Install with: pip install 'hermes-agent[mcp]'",
+            "Install with: pip install 'caesar-agent[mcp]'",
             file=sys.stderr,
         )
         sys.exit(1)

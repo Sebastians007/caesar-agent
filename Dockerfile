@@ -6,20 +6,20 @@ RUN apt-get update && \
         build-essential nodejs npm python3 python3-pip ripgrep ffmpeg gcc python3-dev libffi-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY . /opt/hermes
-WORKDIR /opt/hermes
+COPY . /opt/caesar
+WORKDIR /opt/caesar
 
 # Install Python and Node dependencies in one layer, no cache
 RUN pip install --no-cache-dir -e ".[all]" --break-system-packages && \
     npm install --prefer-offline --no-audit && \
     npx playwright install --with-deps chromium --only-shell && \
-    cd /opt/hermes/scripts/whatsapp-bridge && \
+    cd /opt/caesar/scripts/whatsapp-bridge && \
     npm install --prefer-offline --no-audit && \
     npm cache clean --force
 
-WORKDIR /opt/hermes
-RUN chmod +x /opt/hermes/docker/entrypoint.sh
+WORKDIR /opt/caesar
+RUN chmod +x /opt/caesar/docker/entrypoint.sh
 
-ENV HERMES_HOME=/opt/data
+ENV CAESAR_HOME=/opt/data
 VOLUME [ "/opt/data" ]
-ENTRYPOINT [ "/opt/hermes/docker/entrypoint.sh" ]
+ENTRYPOINT [ "/opt/caesar/docker/entrypoint.sh" ]

@@ -10,18 +10,18 @@ AI-native cross-session user modeling with dialectic Q&A, semantic search, peer 
 ## Setup
 
 ```bash
-hermes memory setup    # select "honcho"
+caesar memory setup    # select "honcho"
 ```
 
 Or manually:
 ```bash
-hermes config set memory.provider honcho
-echo "HONCHO_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider honcho
+echo "HONCHO_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
 ## Config
 
-Config file: `$HERMES_HOME/honcho.json` (or `~/.honcho/config.json` legacy)
+Config file: `$CAESAR_HOME/honcho.json` (or `~/.honcho/config.json` legacy)
 
 Existing Honcho users: your config and data are preserved. Just set `memory.provider: honcho`.
 

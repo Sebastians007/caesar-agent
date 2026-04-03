@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hermes-agent"
+name = "caesar-agent"
 version = "0.6.0"
-description = "The self-improving AI agent — creates skills from experience, improves them during use, and runs anywhere"
+description = "Caesar Agent — the AI agent that conquers your workflow"
 readme = "README.md"
 requires-python = ">=3.11"
-authors = [{ name = "Nous Research" }]
+authors = [{ name = "Sebastian Sartele", email = "github@Sebastians007" }]
 license = { text = "MIT" }
 dependencies = [
   # Core — pinned to known-good ranges to limit supply chain attack surface
@@ -73,39 +73,39 @@ rl = [
 ]
 yc-bench = ["yc-bench @ git+https://github.com/collinear-ai/yc-bench.git ; python_version >= '3.12'"]
 all = [
-  "hermes-agent[modal]",
-  "hermes-agent[daytona]",
-  "hermes-agent[messaging]",
+  "caesar-agent[modal]",
+  "caesar-agent[daytona]",
+  "caesar-agent[messaging]",
   # matrix excluded: python-olm (required by matrix-nio[e2e]) is upstream-broken
   # on modern macOS (archived libolm, C++ errors with Clang 21+). Including it
   # here causes the entire [all] install to fail, dropping all other extras.
-  # Users who need Matrix can install manually: pip install 'hermes-agent[matrix]'
-  "hermes-agent[cron]",
-  "hermes-agent[cli]",
-  "hermes-agent[dev]",
-  "hermes-agent[tts-premium]",
-  "hermes-agent[slack]",
-  "hermes-agent[pty]",
-  "hermes-agent[honcho]",
-  "hermes-agent[mcp]",
-  "hermes-agent[homeassistant]",
-  "hermes-agent[sms]",
-  "hermes-agent[acp]",
-  "hermes-agent[voice]",
-  "hermes-agent[dingtalk]",
-  "hermes-agent[feishu]",
+  # Users who need Matrix can install manually: pip install 'caesar-agent[matrix]'
+  "caesar-agent[cron]",
+  "caesar-agent[cli]",
+  "caesar-agent[dev]",
+  "caesar-agent[tts-premium]",
+  "caesar-agent[slack]",
+  "caesar-agent[pty]",
+  "caesar-agent[honcho]",
+  "caesar-agent[mcp]",
+  "caesar-agent[homeassistant]",
+  "caesar-agent[sms]",
+  "caesar-agent[acp]",
+  "caesar-agent[voice]",
+  "caesar-agent[dingtalk]",
+  "caesar-agent[feishu]",
 ]
 
 [project.scripts]
-hermes = "hermes_cli.main:main"
-hermes-agent = "run_agent:main"
-hermes-acp = "acp_adapter.entry:main"
+caesar = "caesar_cli.main:main"
+caesar-agent = "run_agent:main"
+caesar-acp = "acp_adapter.entry:main"
 
 [tool.setuptools]
-py-modules = ["run_agent", "model_tools", "toolsets", "batch_runner", "trajectory_compressor", "toolset_distributions", "cli", "hermes_constants", "hermes_state", "hermes_time", "rl_cli", "utils"]
+py-modules = ["run_agent", "model_tools", "toolsets", "batch_runner", "trajectory_compressor", "toolset_distributions", "cli", "caesar_constants", "caesar_state", "caesar_time", "rl_cli", "utils"]
 
 [tool.setuptools.packages.find]
-include = ["agent", "tools", "tools.*", "hermes_cli", "gateway", "gateway.*", "cron", "acp_adapter", "plugins", "plugins.*"]
+include = ["agent", "tools", "tools.*", "caesar_cli", "gateway", "gateway.*", "cron", "acp_adapter", "plugins", "plugins.*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

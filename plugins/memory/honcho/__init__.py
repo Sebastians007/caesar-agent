@@ -8,7 +8,7 @@ The 4 tools (profile, search, context, conclude) are exposed through
 the MemoryProvider interface.
 
 Config: Uses the existing Honcho config chain:
-  1. $HERMES_HOME/honcho.json (profile-scoped)
+  1. $CAESAR_HOME/honcho.json (profile-scoped)
   2. ~/.honcho/config.json (legacy global)
   3. Environment variables
 """
@@ -170,11 +170,11 @@ class HonchoMemoryProvider(MemoryProvider):
         except Exception:
             return False
 
-    def save_config(self, values, hermes_home):
-        """Write config to $HERMES_HOME/honcho.json (Honcho SDK native format)."""
+    def save_config(self, values, caesar_home):
+        """Write config to $CAESAR_HOME/honcho.json (Honcho SDK native format)."""
         import json
         from pathlib import Path
-        config_path = Path(hermes_home) / "honcho.json"
+        config_path = Path(caesar_home) / "honcho.json"
         existing = {}
         if config_path.exists():
             try:
@@ -235,9 +235,9 @@ class HonchoMemoryProvider(MemoryProvider):
 
             # ----- Port #1969: aiPeer sync from SOUL.md -----
             try:
-                hermes_home = kwargs.get("hermes_home", "")
-                if hermes_home and not cfg.raw.get("aiPeer"):
-                    soul_path = Path(hermes_home) / "SOUL.md"
+                caesar_home = kwargs.get("caesar_home", "")
+                if caesar_home and not cfg.raw.get("aiPeer"):
+                    soul_path = Path(caesar_home) / "SOUL.md"
                     if soul_path.exists():
                         soul_text = soul_path.read_text(encoding="utf-8").strip()
                         if soul_text:
@@ -312,7 +312,7 @@ class HonchoMemoryProvider(MemoryProvider):
         self._session_key = (
             cfg.resolve_session_name(session_title=session_title, session_id=session_id)
             or session_id
-            or "hermes-default"
+            or "caesar-default"
         )
         logger.debug("Honcho session key resolved: %s", self._session_key)
 
@@ -323,8 +323,8 @@ class HonchoMemoryProvider(MemoryProvider):
         # ----- B6: Memory file migration (one-time, for new sessions) -----
         try:
             if not session.messages:
-                from hermes_constants import get_hermes_home
-                mem_dir = str(get_hermes_home() / "memories")
+                from caesar_constants import get_caesar_home
+                mem_dir = str(get_caesar_home() / "memories")
                 self._manager.migrate_memory_files(self._session_key, mem_dir)
                 logger.debug("Honcho memory file migration attempted for new session: %s", self._session_key)
         except Exception as e:
@@ -354,7 +354,7 @@ class HonchoMemoryProvider(MemoryProvider):
         try:
             self._do_session_init(
                 self._config,
-                self._lazy_init_session_id or "hermes-default",
+                self._lazy_init_session_id or "caesar-default",
                 **self._lazy_init_kwargs,
             )
             # Clear lazy refs

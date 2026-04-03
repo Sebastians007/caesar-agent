@@ -6,23 +6,23 @@ sidebar_position: 0
 
 # Integrations
 
-Hermes Agent connects to external systems for AI inference, tool servers, IDE workflows, programmatic access, and more. These integrations extend what Hermes can do and where it can run.
+Caesar Agent connects to external systems for AI inference, tool servers, IDE workflows, programmatic access, and more. These integrations extend what Caesar can do and where it can run.
 
 ## AI Providers & Routing
 
-Hermes supports multiple AI inference providers out of the box. Use `hermes model` to configure interactively, or set them in `config.yaml`.
+Caesar supports multiple AI inference providers out of the box. Use `caesar model` to configure interactively, or set them in `config.yaml`.
 
-- **[AI Providers](/docs/user-guide/features/provider-routing)** — OpenRouter, Anthropic, OpenAI, Google, and any OpenAI-compatible endpoint. Hermes auto-detects capabilities like vision, streaming, and tool use per provider.
+- **[AI Providers](/docs/user-guide/features/provider-routing)** — OpenRouter, Anthropic, OpenAI, Google, and any OpenAI-compatible endpoint. Caesar auto-detects capabilities like vision, streaming, and tool use per provider.
 - **[Provider Routing](/docs/user-guide/features/provider-routing)** — Fine-grained control over which underlying providers handle your OpenRouter requests. Optimize for cost, speed, or quality with sorting, whitelists, blacklists, and explicit priority ordering.
 - **[Fallback Providers](/docs/user-guide/features/fallback-providers)** — Automatic failover to backup LLM providers when your primary model encounters errors. Includes primary model fallback and independent auxiliary task fallback for vision, compression, and web extraction.
 
 ## Tool Servers (MCP)
 
-- **[MCP Servers](/docs/user-guide/features/mcp)** — Connect Hermes to external tool servers via Model Context Protocol. Access tools from GitHub, databases, file systems, browser stacks, internal APIs, and more without writing native Hermes tools. Supports both stdio and SSE transports, per-server tool filtering, and capability-aware resource/prompt registration.
+- **[MCP Servers](/docs/user-guide/features/mcp)** — Connect Caesar to external tool servers via Model Context Protocol. Access tools from GitHub, databases, file systems, browser stacks, internal APIs, and more without writing native Caesar tools. Supports both stdio and SSE transports, per-server tool filtering, and capability-aware resource/prompt registration.
 
 ## Web Search Backends
 
-The `web_search`, `web_extract`, and `web_crawl` tools support four backend providers, configured via `config.yaml` or `hermes tools`:
+The `web_search`, `web_extract`, and `web_crawl` tools support four backend providers, configured via `config.yaml` or `caesar tools`:
 
 | Backend | Env Var | Search | Extract | Crawl |
 |---------|---------|--------|---------|-------|
@@ -42,7 +42,7 @@ If `web.backend` is not set, the backend is auto-detected from whichever API key
 
 ## Browser Automation
 
-Hermes includes full browser automation with multiple backend options for navigating websites, filling forms, and extracting information:
+Caesar includes full browser automation with multiple backend options for navigating websites, filling forms, and extracting information:
 
 - **Browserbase** — Managed cloud browsers with anti-bot tooling, CAPTCHA solving, and residential proxies
 - **Browser Use** — Alternative cloud browser provider
@@ -66,15 +66,15 @@ Speech-to-text uses Whisper for voice message transcription on Telegram, Discord
 
 ## IDE & Editor Integration
 
-- **[IDE Integration (ACP)](/docs/user-guide/features/acp)** — Use Hermes Agent inside ACP-compatible editors such as VS Code, Zed, and JetBrains. Hermes runs as an ACP server, rendering chat messages, tool activity, file diffs, and terminal commands inside your editor.
+- **[IDE Integration (ACP)](/docs/user-guide/features/acp)** — Use Caesar Agent inside ACP-compatible editors such as VS Code, Zed, and JetBrains. Caesar runs as an ACP server, rendering chat messages, tool activity, file diffs, and terminal commands inside your editor.
 
 ## Programmatic Access
 
-- **[API Server](/docs/user-guide/features/api-server)** — Expose Hermes as an OpenAI-compatible HTTP endpoint. Any frontend that speaks the OpenAI format — Open WebUI, LobeChat, LibreChat, NextChat, ChatBox — can connect and use Hermes as a backend with its full toolset.
+- **[API Server](/docs/user-guide/features/api-server)** — Expose Caesar as an OpenAI-compatible HTTP endpoint. Any frontend that speaks the OpenAI format — Open WebUI, LobeChat, LibreChat, NextChat, ChatBox — can connect and use Caesar as a backend with its full toolset.
 
 ## Memory & Personalization
 
-- **[Honcho Memory](/docs/user-guide/features/honcho)** — AI-native persistent memory for cross-session user modeling and personalization. Honcho adds deep user modeling via dialectic reasoning on top of Hermes's built-in memory system.
+- **[Honcho Memory](/docs/user-guide/features/honcho)** — AI-native persistent memory for cross-session user modeling and personalization. Honcho adds deep user modeling via dialectic reasoning on top of Caesar's built-in memory system.
 
 ## Training & Evaluation
 

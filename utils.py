@@ -1,4 +1,4 @@
-"""Shared utility functions for hermes-agent."""
+"""Shared utility functions for caesar-agent."""
 
 import json
 import os

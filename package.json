@@ -1,20 +1,20 @@
 {
-  "name": "hermes-agent",
+  "name": "caesar-agent",
   "version": "1.0.0",
-  "description": "An AI agent with advanced tool-calling capabilities, featuring a flexible toolsets system for organizing and managing tools.",
+  "description": "Caesar Agent — the AI agent that conquers your workflow",
   "private": true,
   "scripts": {
     "postinstall": "echo '✅ Browser tools ready. Run: python run_agent.py --help'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NousResearch/Hermes-Agent.git"
+    "url": "git+https://github.com/Sebastians007/caesar-agent.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NousResearch/Hermes-Agent/issues"
+    "url": "https://github.com/Sebastians007/caesar-agent/issues"
   },
-  "homepage": "https://github.com/NousResearch/Hermes-Agent#readme",
+  "homepage": "https://github.com/Sebastians007/caesar-agent#readme",
   "dependencies": {
     "agent-browser": "^0.13.0",
     "@askjo/camoufox-browser": "^1.0.0"

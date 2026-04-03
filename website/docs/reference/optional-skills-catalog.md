@@ -6,7 +6,7 @@ description: "Catalog of official optional skills available from the repository"
 
 # Official Optional Skills Catalog
 
-Official optional skills live in the repository under `optional-skills/`. Install them with `hermes skills install official/<category>/<skill>` or browse them with `hermes skills browse --source official`.
+Official optional skills live in the repository under `optional-skills/`. Install them with `caesar skills install official/<category>/<skill>` or browse them with `caesar skills browse --source official`.
 
 ## autonomous-ai-agents
 
@@ -25,14 +25,14 @@ Official optional skills live in the repository under `optional-skills/`. Instal
 
 | Skill | Description | Path |
 |-------|-------------|------|
-| `blender-mcp` | Control Blender directly from Hermes via socket connection to the blender-mcp addon. Create 3D objects, materials, animations, and run arbitrary Blender Python. | `creative/blender-mcp` |
+| `blender-mcp` | Control Blender directly from Caesar via socket connection to the blender-mcp addon. Create 3D objects, materials, animations, and run arbitrary Blender Python. | `creative/blender-mcp` |
 | `meme-generation` | Generate real meme images by picking a template and overlaying text with Pillow. Produces actual .png meme files. | `creative/meme-generation` |
 
 ## email
 
 | Skill | Description | Path |
 |-------|-------------|------|
-| `agentmail` | Give the agent its own dedicated email inbox via AgentMail. Send, receive, and manage email autonomously using agent-owned email addresses (e.g. hermes-agent@agentmail.to). | `email/agentmail` |
+| `agentmail` | Give the agent its own dedicated email inbox via AgentMail. Send, receive, and manage email autonomously using agent-owned email addresses (e.g. caesar-agent@agentmail.to). | `email/agentmail` |
 
 ## health
 
@@ -50,13 +50,13 @@ Official optional skills live in the repository under `optional-skills/`. Instal
 
 | Skill | Description | Path |
 |-------|-------------|------|
-| `openclaw-migration` | Migrate a user's OpenClaw customization footprint into Hermes Agent. Imports Hermes-compatible memories, SOUL.md, command allowlists, user skills, and selected workspace assets from ~/.openclaw, then reports exactly what could not be migrated and why. | `migration/openclaw-migration` |
+| `openclaw-migration` | Migrate a user's OpenClaw customization footprint into Caesar Agent. Imports Caesar-compatible memories, SOUL.md, command allowlists, user skills, and selected workspace assets from ~/.openclaw, then reports exactly what could not be migrated and why. | `migration/openclaw-migration` |
 
 ## productivity
 
 | Skill | Description | Path |
 |-------|-------------|------|
-| `telephony` | Give Hermes phone capabilities — provision a Twilio number, send/receive SMS/MMS, make direct calls, and place AI-driven outbound calls through Bland.ai or Vapi. | `productivity/telephony` |
+| `telephony` | Give Caesar phone capabilities — provision a Twilio number, send/receive SMS/MMS, make direct calls, and place AI-driven outbound calls through Bland.ai or Vapi. | `productivity/telephony` |
 
 ## research
 

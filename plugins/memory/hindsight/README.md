@@ -10,23 +10,23 @@ Long-term memory with knowledge graph, entity resolution, and multi-strategy ret
 ## Setup
 
 ```bash
-hermes memory setup    # select "hindsight"
+caesar memory setup    # select "hindsight"
 ```
 
 Or manually:
 ```bash
-hermes config set memory.provider hindsight
-echo "HINDSIGHT_API_KEY=your-key" >> ~/.hermes/.env
+caesar config set memory.provider hindsight
+echo "HINDSIGHT_API_KEY=your-key" >> ~/.caesar/.env
 ```
 
 ## Config
 
-Config file: `$HERMES_HOME/hindsight/config.json` (or `~/.hindsight/config.json` legacy)
+Config file: `$CAESAR_HOME/hindsight/config.json` (or `~/.hindsight/config.json` legacy)
 
 | Key | Default | Description |
 |-----|---------|-------------|
 | `mode` | `cloud` | `cloud` or `local` |
-| `bank_id` | `hermes` | Memory bank identifier |
+| `bank_id` | `caesar` | Memory bank identifier |
 | `budget` | `mid` | Recall thoroughness: `low`/`mid`/`high` |
 
 ## Tools

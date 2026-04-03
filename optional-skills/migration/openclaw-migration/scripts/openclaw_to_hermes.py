@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""OpenClaw -> Hermes migration helper.
+"""OpenClaw -> Caesar migration helper.
 
 This script migrates the parts of an OpenClaw user footprint that map cleanly
-into Hermes Agent, archives selected unmapped docs for manual review, and
+into Caesar Agent, archives selected unmapped docs for manual review, and
 reports exactly what was skipped and why.
 """
 
@@ -45,7 +45,7 @@ WORKSPACE_INSTRUCTIONS_FILENAME = "AGENTS" + ".md"
 MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     "soul": {
         "label": "SOUL.md",
-        "description": "Import the OpenClaw persona file into Hermes.",
+        "description": "Import the OpenClaw persona file into Caesar.",
     },
     "workspace-agents": {
         "label": "Workspace instructions",
@@ -53,67 +53,67 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "memory": {
         "label": "MEMORY.md",
-        "description": "Import long-term memory entries into Hermes memories.",
+        "description": "Import long-term memory entries into Caesar memories.",
     },
     "user-profile": {
         "label": "USER.md",
-        "description": "Import user profile entries into Hermes memories.",
+        "description": "Import user profile entries into Caesar memories.",
     },
     "messaging-settings": {
         "label": "Messaging settings",
-        "description": "Import Hermes-compatible messaging settings such as allowlists and working directory.",
+        "description": "Import Caesar-compatible messaging settings such as allowlists and working directory.",
     },
     "secret-settings": {
         "label": "Allowlisted secrets",
-        "description": "Import the small allowlist of Hermes-compatible secrets when explicitly enabled.",
+        "description": "Import the small allowlist of Caesar-compatible secrets when explicitly enabled.",
     },
     "command-allowlist": {
         "label": "Command allowlist",
-        "description": "Merge OpenClaw exec approval patterns into Hermes command_allowlist.",
+        "description": "Merge OpenClaw exec approval patterns into Caesar command_allowlist.",
     },
     "skills": {
         "label": "User skills",
-        "description": "Copy OpenClaw skills into ~/.hermes/skills/openclaw-imports/.",
+        "description": "Copy OpenClaw skills into ~/.caesar/skills/openclaw-imports/.",
     },
     "tts-assets": {
         "label": "TTS assets",
-        "description": "Copy compatible workspace TTS assets into ~/.hermes/tts/.",
+        "description": "Copy compatible workspace TTS assets into ~/.caesar/tts/.",
     },
     "discord-settings": {
         "label": "Discord settings",
-        "description": "Import Discord bot token and allowlist into Hermes .env.",
+        "description": "Import Discord bot token and allowlist into Caesar .env.",
     },
     "slack-settings": {
         "label": "Slack settings",
-        "description": "Import Slack bot/app tokens and allowlist into Hermes .env.",
+        "description": "Import Slack bot/app tokens and allowlist into Caesar .env.",
     },
     "whatsapp-settings": {
         "label": "WhatsApp settings",
-        "description": "Import WhatsApp allowlist into Hermes .env.",
+        "description": "Import WhatsApp allowlist into Caesar .env.",
     },
     "signal-settings": {
         "label": "Signal settings",
-        "description": "Import Signal account, HTTP URL, and allowlist into Hermes .env.",
+        "description": "Import Signal account, HTTP URL, and allowlist into Caesar .env.",
     },
     "provider-keys": {
         "label": "Provider API keys",
-        "description": "Import model provider API keys into Hermes .env (requires --migrate-secrets).",
+        "description": "Import model provider API keys into Caesar .env (requires --migrate-secrets).",
     },
     "model-config": {
         "label": "Default model",
-        "description": "Import the default model setting into Hermes config.yaml.",
+        "description": "Import the default model setting into Caesar config.yaml.",
     },
     "tts-config": {
         "label": "TTS configuration",
-        "description": "Import TTS provider and voice settings into Hermes config.yaml.",
+        "description": "Import TTS provider and voice settings into Caesar config.yaml.",
     },
     "shared-skills": {
         "label": "Shared skills",
-        "description": "Copy shared OpenClaw skills from ~/.openclaw/skills/ into Hermes.",
+        "description": "Copy shared OpenClaw skills from ~/.openclaw/skills/ into Caesar.",
     },
     "daily-memory": {
         "label": "Daily memory files",
-        "description": "Merge daily memory entries from workspace/memory/ into Hermes MEMORY.md.",
+        "description": "Merge daily memory entries from workspace/memory/ into Caesar MEMORY.md.",
     },
     "archive": {
         "label": "Archive unmapped docs",
@@ -121,7 +121,7 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "mcp-servers": {
         "label": "MCP servers",
-        "description": "Import MCP server definitions from OpenClaw into Hermes config.yaml.",
+        "description": "Import MCP server definitions from OpenClaw into Caesar config.yaml.",
     },
     "plugins-config": {
         "label": "Plugins configuration",
@@ -129,7 +129,7 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "cron-jobs": {
         "label": "Cron / scheduled tasks",
-        "description": "Import cron job definitions. Archive for manual recreation via 'hermes cron'.",
+        "description": "Import cron job definitions. Archive for manual recreation via 'caesar cron'.",
     },
     "hooks-config": {
         "label": "Hooks and webhooks",
@@ -137,7 +137,7 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "agent-config": {
         "label": "Agent defaults and multi-agent setup",
-        "description": "Import agent defaults (compaction, context, thinking) into Hermes config. Archive multi-agent list.",
+        "description": "Import agent defaults (compaction, context, thinking) into Caesar config. Archive multi-agent list.",
     },
     "gateway-config": {
         "label": "Gateway configuration",
@@ -145,11 +145,11 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "session-config": {
         "label": "Session configuration",
-        "description": "Import session reset policies (daily/idle) into Hermes session_reset config.",
+        "description": "Import session reset policies (daily/idle) into Caesar session_reset config.",
     },
     "full-providers": {
         "label": "Full model provider definitions",
-        "description": "Import custom model providers (baseUrl, apiType, headers) into Hermes custom_providers.",
+        "description": "Import custom model providers (baseUrl, apiType, headers) into Caesar custom_providers.",
     },
     "deep-channels": {
         "label": "Deep channel configuration",
@@ -157,15 +157,15 @@ MIGRATION_OPTION_METADATA: Dict[str, Dict[str, str]] = {
     },
     "browser-config": {
         "label": "Browser configuration",
-        "description": "Import browser automation settings into Hermes config.yaml.",
+        "description": "Import browser automation settings into Caesar config.yaml.",
     },
     "tools-config": {
         "label": "Tools configuration",
-        "description": "Import tool settings (exec timeout, sandbox, web search) into Hermes config.yaml.",
+        "description": "Import tool settings (exec timeout, sandbox, web search) into Caesar config.yaml.",
     },
     "approvals-config": {
         "label": "Approval rules",
-        "description": "Import approval mode and rules into Hermes config.yaml approvals section.",
+        "description": "Import approval mode and rules into Caesar config.yaml approvals section.",
     },
     "memory-backend": {
         "label": "Memory backend configuration",
@@ -336,7 +336,7 @@ def load_yaml_file(path: Path) -> Dict[str, Any]:
 
 def dump_yaml_file(path: Path, data: Dict[str, Any]) -> None:
     if yaml is None:
-        raise RuntimeError("PyYAML is required to update Hermes config.yaml")
+        raise RuntimeError("PyYAML is required to update Caesar config.yaml")
     ensure_parent(path)
     path.write_text(
         yaml.safe_dump(data, sort_keys=False, allow_unicode=False),
@@ -516,7 +516,7 @@ def write_report(output_dir: Path, report: Dict[str, Any]) -> None:
         grouped.setdefault(item["status"], []).append(item)
 
     lines = [
-        "# OpenClaw -> Hermes Migration Report",
+        "# OpenClaw -> Caesar Migration Report",
         "",
         f"- Timestamp: {report['timestamp']}",
         f"- Mode: {report['mode']}",
@@ -884,7 +884,7 @@ class Migrator:
             self.record("command-allowlist", source, destination, "skipped", "No allowlist patterns found")
             return
         if not destination.exists():
-            self.record("command-allowlist", source, destination, "skipped", "Hermes config.yaml does not exist yet")
+            self.record("command-allowlist", source, destination, "skipped", "Caesar config.yaml does not exist yet")
             return
 
         config = load_yaml_file(destination)
@@ -1002,7 +1002,7 @@ class Migrator:
         if additions:
             self.merge_env_values(additions, "messaging-settings", self.source_root / "openclaw.json")
         else:
-            self.record("messaging-settings", self.source_root / "openclaw.json", self.target_root / ".env", "skipped", "No Hermes-compatible messaging settings found")
+            self.record("messaging-settings", self.source_root / "openclaw.json", self.target_root / ".env", "skipped", "No Caesar-compatible messaging settings found")
 
     def handle_secret_settings(self, config: Optional[Dict[str, Any]] = None) -> None:
         config = config or self.load_openclaw_config()
@@ -1049,7 +1049,7 @@ class Migrator:
                 self.source_root / "openclaw.json",
                 self.target_root / ".env",
                 "skipped",
-                "No allowlisted Hermes-compatible secrets found",
+                "No allowlisted Caesar-compatible secrets found",
                 supported_targets=sorted(SUPPORTED_SECRET_TARGETS),
             )
 
@@ -1219,10 +1219,10 @@ class Migrator:
             "ZAI_API_KEY": "ZAI_API_KEY",
             "MINIMAX_API_KEY": "MINIMAX_API_KEY",
         }
-        for oc_key, hermes_key in env_key_mapping.items():
+        for oc_key, caesar_key in env_key_mapping.items():
             val = openclaw_env.get(oc_key, "").strip()
-            if val and hermes_key not in secret_additions:
-                secret_additions[hermes_key] = val
+            if val and caesar_key not in secret_additions:
+                secret_additions[caesar_key] = val
 
         # Check per-agent auth-profiles.json for additional credentials
         auth_profiles_path = self.source_root / "agents" / "main" / "agent" / "auth-profiles.json"
@@ -1286,8 +1286,8 @@ class Migrator:
             self.record("model-config", source_path, destination, "error", "PyYAML is not available")
             return
 
-        hermes_config = load_yaml_file(destination)
-        current_model = hermes_config.get("model")
+        caesar_config = load_yaml_file(destination)
+        current_model = caesar_config.get("model")
         if current_model == model_str:
             self.record("model-config", source_path, destination, "skipped", "Model already set to the same value")
             return
@@ -1297,12 +1297,12 @@ class Migrator:
 
         if self.execute:
             backup_path = self.maybe_backup(destination)
-            existing_model = hermes_config.get("model")
+            existing_model = caesar_config.get("model")
             if isinstance(existing_model, dict):
                 existing_model["default"] = model_str
             else:
-                hermes_config["model"] = {"default": model_str}
-            dump_yaml_file(destination, hermes_config)
+                caesar_config["model"] = {"default": model_str}
+            dump_yaml_file(destination, caesar_config)
             self.record("model-config", source_path, destination, "migrated", backup=str(backup_path) if backup_path else "", model=model_str)
         else:
             self.record("model-config", source_path, destination, "migrated", "Would set model", model=model_str)
@@ -1387,8 +1387,8 @@ class Migrator:
             self.record("tts-config", source_path, destination, "skipped", "No compatible TTS settings found")
             return
 
-        hermes_config = load_yaml_file(destination)
-        existing_tts = hermes_config.get("tts", {})
+        caesar_config = load_yaml_file(destination)
+        existing_tts = caesar_config.get("tts", {})
         if not isinstance(existing_tts, dict):
             existing_tts = {}
 
@@ -1400,8 +1400,8 @@ class Migrator:
                     merged_tts[key] = {**merged_tts[key], **value}
                 else:
                     merged_tts[key] = value
-            hermes_config["tts"] = merged_tts
-            dump_yaml_file(destination, hermes_config)
+            caesar_config["tts"] = merged_tts
+            dump_yaml_file(destination, caesar_config)
             self.record("tts-config", source_path, destination, "migrated", backup=str(backup_path) if backup_path else "", settings=list(tts_data.keys()))
         else:
             self.record("tts-config", source_path, destination, "migrated", "Would set TTS config", settings=list(tts_data.keys()))
@@ -1645,16 +1645,16 @@ class Migrator:
         ]
         for candidate in candidates:
             if candidate:
-                self.archive_path(candidate, reason="No direct Hermes destination; archived for manual review")
+                self.archive_path(candidate, reason="No direct Caesar destination; archived for manual review")
 
         for rel in ("workspace/.learnings", "workspace/memory"):
             candidate = self.source_root / rel
             if candidate.exists():
-                self.archive_path(candidate, reason="No direct Hermes destination; archived for manual review")
+                self.archive_path(candidate, reason="No direct Caesar destination; archived for manual review")
 
         partially_extracted = [
-            ("openclaw.json", "Selected Hermes-compatible values were extracted; raw OpenClaw config was not copied."),
-            ("credentials/telegram-default-allowFrom.json", "Selected Hermes-compatible values were extracted; raw credentials file was not copied."),
+            ("openclaw.json", "Selected Caesar-compatible values were extracted; raw OpenClaw config was not copied."),
+            ("credentials/telegram-default-allowFrom.json", "Selected Caesar-compatible values were extracted; raw credentials file was not copied."),
         ]
         for rel, reason in partially_extracted:
             candidate = self.source_root / rel
@@ -1693,9 +1693,9 @@ class Migrator:
             self.record("mcp-servers", None, None, "skipped", "No MCP servers found in OpenClaw config")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
-        existing_mcp = hermes_cfg.get("mcp_servers") or {}
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
+        existing_mcp = caesar_cfg.get("mcp_servers") or {}
         added = 0
 
         for name, srv in mcp_raw.items():
@@ -1703,45 +1703,45 @@ class Migrator:
                 continue
             if name in existing_mcp and not self.overwrite:
                 self.record("mcp-servers", f"mcp.servers.{name}", f"mcp_servers.{name}", "conflict",
-                            "MCP server already exists in Hermes config")
+                            "MCP server already exists in Caesar config")
                 continue
 
-            hermes_srv: Dict[str, Any] = {}
+            caesar_srv: Dict[str, Any] = {}
             # STDIO transport
             if srv.get("command"):
-                hermes_srv["command"] = srv["command"]
+                caesar_srv["command"] = srv["command"]
                 if srv.get("args"):
-                    hermes_srv["args"] = srv["args"]
+                    caesar_srv["args"] = srv["args"]
                 if srv.get("env"):
-                    hermes_srv["env"] = srv["env"]
+                    caesar_srv["env"] = srv["env"]
                 if srv.get("cwd"):
-                    hermes_srv["cwd"] = srv["cwd"]
+                    caesar_srv["cwd"] = srv["cwd"]
             # HTTP/SSE transport
             if srv.get("url"):
-                hermes_srv["url"] = srv["url"]
+                caesar_srv["url"] = srv["url"]
                 if srv.get("headers"):
-                    hermes_srv["headers"] = srv["headers"]
+                    caesar_srv["headers"] = srv["headers"]
                 if srv.get("auth"):
-                    hermes_srv["auth"] = srv["auth"]
+                    caesar_srv["auth"] = srv["auth"]
             # Common fields
             if srv.get("enabled") is False:
-                hermes_srv["enabled"] = False
+                caesar_srv["enabled"] = False
             if srv.get("timeout"):
-                hermes_srv["timeout"] = srv["timeout"]
+                caesar_srv["timeout"] = srv["timeout"]
             if srv.get("connectTimeout"):
-                hermes_srv["connect_timeout"] = srv["connectTimeout"]
+                caesar_srv["connect_timeout"] = srv["connectTimeout"]
             # Tool filtering
             tools_cfg = srv.get("tools") or {}
             if tools_cfg.get("include") or tools_cfg.get("exclude"):
-                hermes_srv["tools"] = {}
+                caesar_srv["tools"] = {}
                 if tools_cfg.get("include"):
-                    hermes_srv["tools"]["include"] = tools_cfg["include"]
+                    caesar_srv["tools"]["include"] = tools_cfg["include"]
                 if tools_cfg.get("exclude"):
-                    hermes_srv["tools"]["exclude"] = tools_cfg["exclude"]
+                    caesar_srv["tools"]["exclude"] = tools_cfg["exclude"]
             # Sampling
             sampling = srv.get("sampling")
             if sampling and isinstance(sampling, dict):
-                hermes_srv["sampling"] = {
+                caesar_srv["sampling"] = {
                     k: v for k, v in {
                         "enabled": sampling.get("enabled"),
                         "model": sampling.get("model"),
@@ -1751,15 +1751,15 @@ class Migrator:
                     }.items() if v is not None
                 }
 
-            existing_mcp[name] = hermes_srv
+            existing_mcp[name] = caesar_srv
             added += 1
             self.record("mcp-servers", f"mcp.servers.{name}", f"config.yaml mcp_servers.{name}",
                         "migrated", servers_added=added)
 
         if added > 0 and self.execute:
-            self.maybe_backup(hermes_cfg_path)
-            hermes_cfg["mcp_servers"] = existing_mcp
-            dump_yaml_file(hermes_cfg_path, hermes_cfg)
+            self.maybe_backup(caesar_cfg_path)
+            caesar_cfg["mcp_servers"] = existing_mcp
+            dump_yaml_file(caesar_cfg_path, caesar_cfg)
 
     # ── Plugins ───────────────────────────────────────────────
     def migrate_plugins_config(self, config: Optional[Dict[str, Any]] = None) -> None:
@@ -1813,7 +1813,7 @@ class Migrator:
             dest = self.archive_dir / "cron-config.json"
             dest.write_text(json.dumps(cron, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             self.record("cron-jobs", "openclaw.json cron.*", str(dest), "archived",
-                        "Cron config archived. Use 'hermes cron' to recreate jobs manually.")
+                        "Cron config archived. Use 'caesar cron' to recreate jobs manually.")
         else:
             self.record("cron-jobs", "openclaw.json cron.*", "archive/cron-config.json",
                         "archived", "Would archive cron config")
@@ -1868,12 +1868,12 @@ class Migrator:
             self.record("agent-config", None, None, "skipped", "No agent configuration found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
         changes = False
 
         # Map agent defaults
-        agent_cfg = hermes_cfg.get("agent") or {}
+        agent_cfg = caesar_cfg.get("agent") or {}
         if defaults.get("contextTokens"):
             # No direct mapping but useful context
             pass
@@ -1884,7 +1884,7 @@ class Migrator:
             agent_cfg["verbose"] = defaults["verboseDefault"]
             changes = True
         if defaults.get("thinkingDefault"):
-            # Map OpenClaw thinking -> Hermes reasoning_effort
+            # Map OpenClaw thinking -> Caesar reasoning_effort
             thinking = defaults["thinkingDefault"]
             if thinking in ("always", "high"):
                 agent_cfg["reasoning_effort"] = "high"
@@ -1897,7 +1897,7 @@ class Migrator:
         # Map compaction -> compression
         compaction = defaults.get("compaction") or {}
         if compaction:
-            compression = hermes_cfg.get("compression") or {}
+            compression = caesar_cfg.get("compression") or {}
             if compaction.get("mode") == "off":
                 compression["enabled"] = False
             else:
@@ -1906,13 +1906,13 @@ class Migrator:
                 pass  # No direct mapping
             if compaction.get("model"):
                 compression["summary_model"] = compaction["model"]
-            hermes_cfg["compression"] = compression
+            caesar_cfg["compression"] = compression
             changes = True
 
         # Map humanDelay
         human_delay = defaults.get("humanDelay") or {}
         if human_delay:
-            hd = hermes_cfg.get("human_delay") or {}
+            hd = caesar_cfg.get("human_delay") or {}
             hd_mode = human_delay.get("mode") or ("natural" if human_delay.get("enabled") else None)
             if hd_mode and hd_mode != "off":
                 hd["mode"] = hd_mode
@@ -1920,40 +1920,40 @@ class Migrator:
                 hd["min_ms"] = human_delay["minMs"]
             if human_delay.get("maxMs"):
                 hd["max_ms"] = human_delay["maxMs"]
-            hermes_cfg["human_delay"] = hd
+            caesar_cfg["human_delay"] = hd
             changes = True
 
         # Map userTimezone
         if defaults.get("userTimezone"):
-            hermes_cfg["timezone"] = defaults["userTimezone"]
+            caesar_cfg["timezone"] = defaults["userTimezone"]
             changes = True
 
         # Map terminal/exec settings
         exec_cfg = (config.get("tools") or {}).get("exec") or {}
         if exec_cfg:
-            terminal_cfg = hermes_cfg.get("terminal") or {}
+            terminal_cfg = caesar_cfg.get("terminal") or {}
             if exec_cfg.get("timeoutSec") or exec_cfg.get("timeout"):
                 terminal_cfg["timeout"] = exec_cfg.get("timeoutSec") or exec_cfg.get("timeout")
                 changes = True
-            hermes_cfg["terminal"] = terminal_cfg
+            caesar_cfg["terminal"] = terminal_cfg
 
         # Map sandbox -> terminal docker settings
         sandbox = defaults.get("sandbox") or {}
         if sandbox and sandbox.get("backend") == "docker":
-            terminal_cfg = hermes_cfg.get("terminal") or {}
+            terminal_cfg = caesar_cfg.get("terminal") or {}
             terminal_cfg["backend"] = "docker"
             if sandbox.get("docker", {}).get("image"):
                 terminal_cfg["docker_image"] = sandbox["docker"]["image"]
-            hermes_cfg["terminal"] = terminal_cfg
+            caesar_cfg["terminal"] = terminal_cfg
             changes = True
 
         if changes:
-            hermes_cfg["agent"] = agent_cfg
+            caesar_cfg["agent"] = agent_cfg
             if self.execute:
-                self.maybe_backup(hermes_cfg_path)
-                dump_yaml_file(hermes_cfg_path, hermes_cfg)
+                self.maybe_backup(caesar_cfg_path)
+                dump_yaml_file(caesar_cfg_path, caesar_cfg)
             self.record("agent-config", "openclaw.json agents.defaults", "config.yaml agent/compression/terminal",
-                        "migrated", "Agent defaults mapped to Hermes config")
+                        "migrated", "Agent defaults mapped to Caesar config")
 
         # Archive multi-agent list
         if agent_list:
@@ -1988,12 +1988,12 @@ class Migrator:
             dest = self.archive_dir / "gateway-config.json"
             dest.write_text(json.dumps(gateway, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         self.record("gateway-config", "openclaw.json gateway.*", "archive/gateway-config.json",
-                    "archived", "Gateway config archived. Use 'hermes gateway' to configure.")
+                    "archived", "Gateway config archived. Use 'caesar gateway' to configure.")
 
         # Extract gateway auth token to .env if present
         auth = gateway.get("auth") or {}
         if auth.get("token") and self.migrate_secrets:
-            self._set_env_var("HERMES_GATEWAY_TOKEN", auth["token"], "gateway.auth.token")
+            self._set_env_var("CAESAR_GATEWAY_TOKEN", auth["token"], "gateway.auth.token")
 
     # ── Session config ────────────────────────────────────────
     def migrate_session_config(self, config: Optional[Dict[str, Any]] = None) -> None:
@@ -2003,9 +2003,9 @@ class Migrator:
             self.record("session-config", None, None, "skipped", "No session configuration found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
-        sr = hermes_cfg.get("session_reset") or {}
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
+        sr = caesar_cfg.get("session_reset") or {}
         changes = False
 
         # OpenClaw uses session.reset (structured) and session.resetTriggers (string array)
@@ -2039,10 +2039,10 @@ class Migrator:
             changes = True
 
         if changes:
-            hermes_cfg["session_reset"] = sr
+            caesar_cfg["session_reset"] = sr
             if self.execute:
-                self.maybe_backup(hermes_cfg_path)
-                dump_yaml_file(hermes_cfg_path, hermes_cfg)
+                self.maybe_backup(caesar_cfg_path)
+                dump_yaml_file(caesar_cfg_path, caesar_cfg)
             self.record("session-config", "openclaw.json session.resetTriggers",
                         "config.yaml session_reset", "migrated")
 
@@ -2067,9 +2067,9 @@ class Migrator:
             self.record("full-providers", None, None, "skipped", "No model providers found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
-        custom_providers = hermes_cfg.get("custom_providers") or []
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
+        custom_providers = caesar_cfg.get("custom_providers") or []
         added = 0
 
         # Well-known providers: just extract API keys
@@ -2113,9 +2113,9 @@ class Migrator:
                             f"config.yaml custom_providers[{prov_name}]", "migrated")
 
         if added > 0 and self.execute:
-            self.maybe_backup(hermes_cfg_path)
-            hermes_cfg["custom_providers"] = custom_providers
-            dump_yaml_file(hermes_cfg_path, hermes_cfg)
+            self.maybe_backup(caesar_cfg_path)
+            caesar_cfg["custom_providers"] = custom_providers
+            dump_yaml_file(caesar_cfg_path, caesar_cfg)
 
         # Archive model aliases/catalog
         agent_defaults = (config.get("agents") or {}).get("defaults") or {}
@@ -2177,22 +2177,22 @@ class Migrator:
                         continue
                     self._set_env_var(env_key, str(val), f"channels.{ch_name}.{oc_key}")
 
-        # Map Discord-specific settings to Hermes config
+        # Map Discord-specific settings to Caesar config
         discord_cfg = channels.get("discord") or {}
         if discord_cfg:
-            hermes_cfg_path = self.target_root / "config.yaml"
-            hermes_cfg = load_yaml_file(hermes_cfg_path)
-            discord_hermes = hermes_cfg.get("discord") or {}
+            caesar_cfg_path = self.target_root / "config.yaml"
+            caesar_cfg = load_yaml_file(caesar_cfg_path)
+            discord_caesar = caesar_cfg.get("discord") or {}
             changed = False
             if "requireMention" in discord_cfg:
-                discord_hermes["require_mention"] = discord_cfg["requireMention"]
+                discord_caesar["require_mention"] = discord_cfg["requireMention"]
                 changed = True
             if discord_cfg.get("autoThread") is not None:
-                discord_hermes["auto_thread"] = discord_cfg["autoThread"]
+                discord_caesar["auto_thread"] = discord_cfg["autoThread"]
                 changed = True
             if changed and self.execute:
-                hermes_cfg["discord"] = discord_hermes
-                dump_yaml_file(hermes_cfg_path, hermes_cfg)
+                caesar_cfg["discord"] = discord_caesar
+                dump_yaml_file(caesar_cfg_path, caesar_cfg)
 
         # Archive complex channel configs (group settings, thread bindings, etc.)
         complex_archive = {}
@@ -2222,24 +2222,24 @@ class Migrator:
             self.record("browser-config", None, None, "skipped", "No browser configuration found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
-        browser_hermes = hermes_cfg.get("browser") or {}
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
+        browser_caesar = caesar_cfg.get("browser") or {}
         changed = False
 
-        # Map fields that have Hermes equivalents
+        # Map fields that have Caesar equivalents
         if browser.get("cdpUrl"):
-            browser_hermes["cdp_url"] = browser["cdpUrl"]
+            browser_caesar["cdp_url"] = browser["cdpUrl"]
             changed = True
         if browser.get("headless") is not None:
-            browser_hermes["headless"] = browser["headless"]
+            browser_caesar["headless"] = browser["headless"]
             changed = True
 
         if changed:
-            hermes_cfg["browser"] = browser_hermes
+            caesar_cfg["browser"] = browser_caesar
             if self.execute:
-                self.maybe_backup(hermes_cfg_path)
-                dump_yaml_file(hermes_cfg_path, hermes_cfg)
+                self.maybe_backup(caesar_cfg_path)
+                dump_yaml_file(caesar_cfg_path, caesar_cfg)
             self.record("browser-config", "openclaw.json browser.*", "config.yaml browser",
                         "migrated")
 
@@ -2262,17 +2262,17 @@ class Migrator:
             self.record("tools-config", None, None, "skipped", "No tools configuration found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
         changed = False
 
         # Map exec timeout -> terminal timeout (field is timeoutSec in OpenClaw)
         exec_cfg = tools.get("exec") or {}
         timeout_val = exec_cfg.get("timeoutSec") or exec_cfg.get("timeout")
         if timeout_val:
-            terminal_cfg = hermes_cfg.get("terminal") or {}
+            terminal_cfg = caesar_cfg.get("terminal") or {}
             terminal_cfg["timeout"] = timeout_val
-            hermes_cfg["terminal"] = terminal_cfg
+            caesar_cfg["terminal"] = terminal_cfg
             changed = True
 
         # Map web search API key (path: tools.web.search.brave.apiKey in OpenClaw)
@@ -2284,8 +2284,8 @@ class Migrator:
             self._set_env_var("BRAVE_API_KEY", brave_key, "tools.web.search.brave.apiKey")
 
         if changed and self.execute:
-            self.maybe_backup(hermes_cfg_path)
-            dump_yaml_file(hermes_cfg_path, hermes_cfg)
+            self.maybe_backup(caesar_cfg_path)
+            dump_yaml_file(caesar_cfg_path, caesar_cfg)
             self.record("tools-config", "openclaw.json tools.*", "config.yaml terminal",
                         "migrated")
 
@@ -2306,21 +2306,21 @@ class Migrator:
             self.record("approvals-config", None, None, "skipped", "No approvals configuration found")
             return
 
-        hermes_cfg_path = self.target_root / "config.yaml"
-        hermes_cfg = load_yaml_file(hermes_cfg_path)
+        caesar_cfg_path = self.target_root / "config.yaml"
+        caesar_cfg = load_yaml_file(caesar_cfg_path)
 
         # Map approval mode (nested under approvals.exec.mode in OpenClaw)
         exec_approvals = approvals.get("exec") or {}
         mode = (exec_approvals.get("mode") if isinstance(exec_approvals, dict) else None) or approvals.get("mode") or approvals.get("defaultMode")
         if mode:
             mode_map = {"auto": "off", "always": "manual", "smart": "smart", "manual": "manual"}
-            hermes_mode = mode_map.get(mode, "manual")
-            hermes_cfg.setdefault("approvals", {})["mode"] = hermes_mode
+            caesar_mode = mode_map.get(mode, "manual")
+            caesar_cfg.setdefault("approvals", {})["mode"] = caesar_mode
             if self.execute:
-                self.maybe_backup(hermes_cfg_path)
-                dump_yaml_file(hermes_cfg_path, hermes_cfg)
+                self.maybe_backup(caesar_cfg_path)
+                dump_yaml_file(caesar_cfg_path, caesar_cfg)
             self.record("approvals-config", "openclaw.json approvals.mode",
-                        "config.yaml approvals.mode", "migrated", f"Mapped '{mode}' -> '{hermes_mode}'")
+                        "config.yaml approvals.mode", "migrated", f"Mapped '{mode}' -> '{caesar_mode}'")
 
         # Archive full approvals config
         if len(approvals) > 1 and self.archive_dir:
@@ -2416,7 +2416,7 @@ class Migrator:
         if not self.output_dir:
             return
         notes = [
-            "# OpenClaw -> Hermes Migration Notes",
+            "# OpenClaw -> Caesar Migration Notes",
             "",
             "This document lists items that require manual attention after migration.",
             "",
@@ -2434,7 +2434,7 @@ class Migrator:
                 "## Archived Items (Manual Review Needed)",
                 "",
                 "These OpenClaw configurations were archived because they don't have a",
-                "direct 1:1 mapping in Hermes. Review each file and recreate manually:",
+                "direct 1:1 mapping in Caesar. Review each file and recreate manually:",
                 "",
             ])
             for item in archived:
@@ -2444,9 +2444,9 @@ class Migrator:
         conflicts = [i for i in self.items if i.status == "conflict"]
         if conflicts:
             notes.extend([
-                "## Conflicts (Existing Hermes Config Not Overwritten)",
+                "## Conflicts (Existing Caesar Config Not Overwritten)",
                 "",
-                "These items already existed in your Hermes config. Re-run with",
+                "These items already existed in your Caesar config. Re-run with",
                 "`--overwrite` to force, or merge manually:",
                 "",
             ])
@@ -2458,26 +2458,26 @@ class Migrator:
             "## IMPORTANT: Archive the OpenClaw Directory",
             "",
             "After migration, your OpenClaw directory still exists on disk with workspace",
-            "state files (todo.json, sessions, logs). If the Hermes agent discovers these",
-            "directories, it may read/write to them instead of the Hermes state, causing",
+            "state files (todo.json, sessions, logs). If the Caesar agent discovers these",
+            "directories, it may read/write to them instead of the Caesar state, causing",
             "confusion (e.g., cron jobs reading a different todo list than interactive sessions).",
             "",
-            "**Strongly recommended:** Run `hermes claw cleanup` to rename the OpenClaw",
+            "**Strongly recommended:** Run `caesar claw cleanup` to rename the OpenClaw",
             "directory to `.openclaw.pre-migration`. This prevents the agent from finding it.",
             "The directory is renamed, not deleted — you can undo this at any time.",
             "",
             "If you skip this step and notice the agent getting confused about workspaces",
-            "or todo lists, run `hermes claw cleanup` to fix it.",
+            "or todo lists, run `caesar claw cleanup` to fix it.",
             "",
-            "## Hermes-Specific Setup",
+            "## Caesar-Specific Setup",
             "",
             "After migration, you may want to:",
-            "- Run `hermes claw cleanup` to archive the OpenClaw directory (prevents state confusion)",
-            "- Run `hermes setup` to configure any remaining settings",
-            "- Run `hermes mcp list` to verify MCP servers were imported correctly",
-            "- Run `hermes cron` to recreate scheduled tasks (see archive/cron-config.json)",
-            "- Run `hermes gateway install` if you need the gateway service",
-            "- Review `~/.hermes/config.yaml` for any adjustments",
+            "- Run `caesar claw cleanup` to archive the OpenClaw directory (prevents state confusion)",
+            "- Run `caesar setup` to configure any remaining settings",
+            "- Run `caesar mcp list` to verify MCP servers were imported correctly",
+            "- Run `caesar cron` to recreate scheduled tasks (see archive/cron-config.json)",
+            "- Run `caesar gateway install` if you need the gateway service",
+            "- Review `~/.caesar/config.yaml` for any adjustments",
             "",
         ])
 
@@ -2489,19 +2489,19 @@ class Migrator:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Migrate OpenClaw user state into Hermes Agent.")
+    parser = argparse.ArgumentParser(description="Migrate OpenClaw user state into Caesar Agent.")
     parser.add_argument("--source", default=str(Path.home() / ".openclaw"), help="OpenClaw home directory")
-    parser.add_argument("--target", default=str(Path.home() / ".hermes"), help="Hermes home directory")
+    parser.add_argument("--target", default=str(Path.home() / ".caesar"), help="Caesar home directory")
     parser.add_argument(
         "--workspace-target",
         help="Optional workspace root where the workspace instructions file should be copied",
     )
     parser.add_argument("--execute", action="store_true", help="Apply changes instead of reporting a dry run")
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing Hermes targets after backing them up")
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing Caesar targets after backing them up")
     parser.add_argument(
         "--migrate-secrets",
         action="store_true",
-        help="Import a narrow allowlist of Hermes-compatible secrets into the target env file",
+        help="Import a narrow allowlist of Caesar-compatible secrets into the target env file",
     )
     parser.add_argument(
         "--skill-conflict",
@@ -2561,7 +2561,7 @@ def main() -> int:
 
     print()
     print(f"  ╔══════════════════════════════════════════════════════╗")
-    print(f"  ║   OpenClaw -> Hermes Migration   [{mode_label:>8s}]   ║")
+    print(f"  ║   OpenClaw -> Caesar Migration   [{mode_label:>8s}]   ║")
     print(f"  ╠══════════════════════════════════════════════════════╣")
     print(f"  ║  Source:  {str(report['source_root'])[:42]:<42s}  ║")
     print(f"  ║  Target:  {str(report['target_root'])[:42]:<42s}  ║")
@@ -2584,7 +2584,7 @@ def main() -> int:
             seen_kinds.add(label)
             dest = item.get("destination") or ""
             if dest.startswith(str(report["target_root"])):
-                dest = "~/.hermes/" + dest[len(str(report["target_root"])) + 1:]
+                dest = "~/.caesar/" + dest[len(str(report["target_root"])) + 1:]
             meta = MIGRATION_OPTION_METADATA.get(label, {})
             display = meta.get("label", label)
             print(f"    ✔ {display:<35s} -> {dest}")
@@ -2630,10 +2630,10 @@ def main() -> int:
     if args.execute:
         print()
         print("  Next steps:")
-        print("    1. Review ~/.hermes/config.yaml")
-        print("    2. Run: hermes mcp list")
+        print("    1. Review ~/.caesar/config.yaml")
+        print("    2. Run: caesar mcp list")
         if any(i["kind"] == "cron-jobs" and i["status"] == "archived" for i in items):
-            print("    3. Recreate cron jobs: hermes cron")
+            print("    3. Recreate cron jobs: caesar cron")
         if report.get("output_dir"):
             print(f"    → Full report: {report['output_dir']}/MIGRATION_NOTES.md")
     elif not args.execute:

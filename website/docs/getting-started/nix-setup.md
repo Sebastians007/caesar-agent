@@ -1,12 +1,12 @@
 ---
 sidebar_position: 3
 title: "Nix & NixOS Setup"
-description: "Install and deploy Hermes Agent with Nix — from quick `nix run` to fully declarative NixOS module with container mode"
+description: "Install and deploy Caesar Agent with Nix — from quick `nix run` to fully declarative NixOS module with container mode"
 ---
 
 # Nix & NixOS Setup
 
-Hermes Agent ships a Nix flake with three levels of integration:
+Caesar Agent ships a Nix flake with three levels of integration:
 
 | Level | Who it's for | What you get |
 |-------|-------------|--------------|
@@ -17,9 +17,9 @@ Hermes Agent ships a Nix flake with three levels of integration:
 :::info What's different from the standard install
 The `curl | bash` installer manages Python, Node, and dependencies itself. The Nix flake replaces all of that — every Python dependency is a Nix derivation built by [uv2nix](https://github.com/pyproject-nix/uv2nix), and runtime tools (Node.js, git, ripgrep, ffmpeg) are wrapped into the binary's PATH. There is no runtime pip, no venv activation, no `npm install`.
 
-**For non-NixOS users**, this only changes the install step. Everything after (`hermes setup`, `hermes gateway install`, config editing) works identically to the standard install.
+**For non-NixOS users**, this only changes the install step. Everything after (`caesar setup`, `caesar gateway install`, config editing) works identically to the standard install.
 
-**For NixOS module users**, the entire lifecycle is different: configuration lives in `configuration.nix`, secrets go through sops-nix/agenix, the service is a systemd unit, and CLI config commands are blocked. You manage hermes the same way you manage any other NixOS service.
+**For NixOS module users**, the entire lifecycle is different: configuration lives in `configuration.nix`, secrets go through sops-nix/agenix, the service is a systemd unit, and CLI config commands are blocked. You manage caesar the same way you manage any other NixOS service.
 :::
 
 ## Prerequisites
@@ -35,25 +35,25 @@ No clone needed. Nix fetches, builds, and runs everything:
 
 ```bash
 # Run directly (builds on first use, cached after)
-nix run github:NousResearch/hermes-agent -- setup
-nix run github:NousResearch/hermes-agent -- chat
+nix run github:Sebastians007/caesar-agent -- setup
+nix run github:Sebastians007/caesar-agent -- chat
 
 # Or install persistently
-nix profile install github:NousResearch/hermes-agent
-hermes setup
-hermes chat
+nix profile install github:Sebastians007/caesar-agent
+caesar setup
+caesar chat
 ```
 
-After `nix profile install`, `hermes`, `hermes-agent`, and `hermes-acp` are on your PATH. From here, the workflow is identical to the [standard installation](./installation.md) — `hermes setup` walks you through provider selection, `hermes gateway install` sets up a launchd (macOS) or systemd user service, and config lives in `~/.hermes/`.
+After `nix profile install`, `caesar`, `caesar-agent`, and `caesar-acp` are on your PATH. From here, the workflow is identical to the [standard installation](./installation.md) — `caesar setup` walks you through provider selection, `caesar gateway install` sets up a launchd (macOS) or systemd user service, and config lives in `~/.caesar/`.
 
 <details>
 <summary><strong>Building from a local clone</strong></summary>
 
 ```bash
-git clone https://github.com/NousResearch/hermes-agent.git
-cd hermes-agent
+git clone https://github.com/Sebastians007/caesar-agent.git
+cd caesar-agent
 nix build
-./result/bin/hermes setup
+./result/bin/caesar setup
 ```
 
 </details>
@@ -75,14 +75,14 @@ This module requires NixOS. For non-NixOS systems (macOS, other Linux distros), 
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    hermes-agent.url = "github:NousResearch/hermes-agent";
+    caesar-agent.url = "github:Sebastians007/caesar-agent";
   };
 
-  outputs = { nixpkgs, hermes-agent, ... }: {
+  outputs = { nixpkgs, caesar-agent, ... }: {
     nixosConfigurations.your-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        hermes-agent.nixosModules.default
+        caesar-agent.nixosModules.default
         ./configuration.nix
       ];
     };
@@ -95,31 +95,31 @@ This module requires NixOS. For non-NixOS systems (macOS, other Linux distros), 
 ```nix
 # configuration.nix
 { config, ... }: {
-  services.hermes-agent = {
+  services.caesar-agent = {
     enable = true;
     settings.model.default = "anthropic/claude-sonnet-4";
-    environmentFiles = [ config.sops.secrets."hermes-env".path ];
+    environmentFiles = [ config.sops.secrets."caesar-env".path ];
     addToSystemPackages = true;
   };
 }
 ```
 
-That's it. `nixos-rebuild switch` creates the `hermes` user, generates `config.yaml`, wires up secrets, and starts the gateway — a long-running service that connects the agent to messaging platforms (Telegram, Discord, etc.) and listens for incoming messages.
+That's it. `nixos-rebuild switch` creates the `caesar` user, generates `config.yaml`, wires up secrets, and starts the gateway — a long-running service that connects the agent to messaging platforms (Telegram, Discord, etc.) and listens for incoming messages.
 
 :::warning Secrets are required
 The `environmentFiles` line above assumes you have [sops-nix](https://github.com/Mic92/sops-nix) or [agenix](https://github.com/ryantm/agenix) configured. The file should contain at least one LLM provider key (e.g., `OPENROUTER_API_KEY=sk-or-...`). See [Secrets Management](#secrets-management) for full setup. If you don't have a secrets manager yet, you can use a plain file as a starting point — just ensure it's not world-readable:
 
 ```bash
-echo "OPENROUTER_API_KEY=sk-or-your-key" | sudo install -m 0600 -o hermes /dev/stdin /var/lib/hermes/env
+echo "OPENROUTER_API_KEY=sk-or-your-key" | sudo install -m 0600 -o caesar /dev/stdin /var/lib/caesar/env
 ```
 
 ```nix
-services.hermes-agent.environmentFiles = [ "/var/lib/hermes/env" ];
+services.caesar-agent.environmentFiles = [ "/var/lib/caesar/env" ];
 ```
 :::
 
 :::tip addToSystemPackages
-Setting `addToSystemPackages = true` does two things: puts the `hermes` CLI on your system PATH **and** sets `HERMES_HOME` system-wide so the interactive CLI shares state (sessions, skills, cron) with the gateway service. Without it, running `hermes` in your shell creates a separate `~/.hermes/` directory.
+Setting `addToSystemPackages = true` does two things: puts the `caesar` CLI on your system PATH **and** sets `CAESAR_HOME` system-wide so the interactive CLI shares state (sessions, skills, cron) with the gateway service. Without it, running `caesar` in your shell creates a separate `~/.caesar/` directory.
 :::
 
 ### Verify It Works
@@ -128,14 +128,14 @@ After `nixos-rebuild switch`, check that the service is running:
 
 ```bash
 # Check service status
-systemctl status hermes-agent
+systemctl status caesar-agent
 
 # Watch logs (Ctrl+C to stop)
-journalctl -u hermes-agent -f
+journalctl -u caesar-agent -f
 
 # If addToSystemPackages is true, test the CLI
-hermes version
-hermes config       # shows the generated config
+caesar version
+caesar config       # shows the generated config
 ```
 
 ### Choosing a Deployment Mode
@@ -154,7 +154,7 @@ To enable container mode, add one line:
 
 ```nix
 {
-  services.hermes-agent = {
+  services.caesar-agent = {
     enable = true;
     container.enable = true;
     # ... rest of config is identical
@@ -176,14 +176,14 @@ The `settings` option accepts an arbitrary attrset that is rendered as `config.y
 
 ```nix
 # base.nix
-services.hermes-agent.settings = {
+services.caesar-agent.settings = {
   model.default = "anthropic/claude-sonnet-4";
   toolsets = [ "all" ];
   terminal = { backend = "local"; timeout = 180; };
 };
 
 # personality.nix
-services.hermes-agent.settings = {
+services.caesar-agent.settings = {
   display = { compact = false; personality = "kawaii"; };
   memory = { memory_enabled = true; user_profile_enabled = true; };
 };
@@ -192,7 +192,7 @@ services.hermes-agent.settings = {
 Both are deep-merged at evaluation time. Nix-declared keys always win over keys in an existing `config.yaml` on disk, but **user-added keys that Nix doesn't touch are preserved**. This means if the agent or a manual edit adds keys like `skills.disabled` or `streaming.enabled`, they survive `nixos-rebuild switch`.
 
 :::note Model naming
-`settings.model.default` uses the model identifier your provider expects. With [OpenRouter](https://openrouter.ai) (the default), these look like `"anthropic/claude-sonnet-4"` or `"google/gemini-3-flash"`. If you're using a provider directly (Anthropic, OpenAI), set `settings.model.base_url` to point at their API and use their native model IDs (e.g., `"claude-sonnet-4-20250514"`). When no `base_url` is set, Hermes defaults to OpenRouter.
+`settings.model.default` uses the model identifier your provider expects. With [OpenRouter](https://openrouter.ai) (the default), these look like `"anthropic/claude-sonnet-4"` or `"google/gemini-3-flash"`. If you're using a provider directly (Anthropic, OpenAI), set `settings.model.base_url` to point at their API and use their native model IDs (e.g., `"claude-sonnet-4-20250514"`). When no `base_url` is set, Caesar defaults to OpenRouter.
 :::
 
 :::tip Discovering available config keys
@@ -204,7 +204,7 @@ Run `nix build .#configKeys && cat result` to see every leaf config key extracte
 
 ```nix
 { config, ... }: {
-  services.hermes-agent = {
+  services.caesar-agent = {
     enable = true;
     container.enable = true;
 
@@ -228,11 +228,11 @@ Run `nix build .#configKeys && cat result` to see every leaf config key extracte
     };
 
     # ── Secrets ────────────────────────────────────────────────────────
-    environmentFiles = [ config.sops.secrets."hermes-env".path ];
+    environmentFiles = [ config.sops.secrets."caesar-env".path ];
 
     # ── Documents ──────────────────────────────────────────────────────
     documents = {
-      "SOUL.md" = builtins.readFile /home/user/.hermes/SOUL.md;
+      "SOUL.md" = builtins.readFile /home/user/.caesar/SOUL.md;
       "USER.md" = ./documents/USER.md;
     };
 
@@ -266,10 +266,10 @@ Run `nix build .#configKeys && cat result` to see every leaf config key extracte
 If you'd rather manage `config.yaml` entirely outside Nix, use `configFile`:
 
 ```nix
-services.hermes-agent.configFile = /etc/hermes/config.yaml;
+services.caesar-agent.configFile = /etc/caesar/config.yaml;
 ```
 
-This bypasses `settings` entirely — no merge, no generation. The file is copied as-is to `$HERMES_HOME/config.yaml` on each activation.
+This bypasses `settings` entirely — no merge, no generation. The file is copied as-is to `$CAESAR_HOME/config.yaml` on each activation.
 
 ### Customization Cheatsheet
 
@@ -279,7 +279,7 @@ Quick reference for the most common things Nix users want to customize:
 |---|---|---|
 | Change the LLM model | `settings.model.default` | `"anthropic/claude-sonnet-4"` |
 | Use a different provider endpoint | `settings.model.base_url` | `"https://openrouter.ai/api/v1"` |
-| Add API keys | `environmentFiles` | `[ config.sops.secrets."hermes-env".path ]` |
+| Add API keys | `environmentFiles` | `[ config.sops.secrets."caesar-env".path ]` |
 | Give the agent a personality | `documents."SOUL.md"` | `builtins.readFile ./my-soul.md` |
 | Add MCP tool servers | `mcpServers.<name>` | See [MCP Servers](#mcp-servers) |
 | Mount host directories into container | `container.extraVolumes` | `[ "/data:/data:rw" ]` |
@@ -287,8 +287,8 @@ Quick reference for the most common things Nix users want to customize:
 | Use Podman instead of Docker | `container.backend` | `"podman"` |
 | Add tools to the service PATH (native only) | `extraPackages` | `[ pkgs.pandoc pkgs.imagemagick ]` |
 | Use a custom base image | `container.image` | `"ubuntu:24.04"` |
-| Override the hermes package | `package` | `inputs.hermes-agent.packages.${system}.default.override { ... }` |
-| Change state directory | `stateDir` | `"/opt/hermes"` |
+| Override the caesar package | `package` | `inputs.caesar-agent.packages.${system}.default.override { ... }` |
+| Change state directory | `stateDir` | `"/opt/caesar"` |
 | Set the agent's working directory | `workingDirectory` | `"/home/user/projects"` |
 
 ---
@@ -299,20 +299,20 @@ Quick reference for the most common things Nix users want to customize:
 Values in Nix expressions end up in `/nix/store`, which is world-readable. Always use `environmentFiles` with a secrets manager.
 :::
 
-Both `environment` (non-secret vars) and `environmentFiles` (secret files) are merged into `$HERMES_HOME/.env` at activation time (`nixos-rebuild switch`). Hermes reads this file on every startup, so changes take effect with a `systemctl restart hermes-agent` — no container recreation needed.
+Both `environment` (non-secret vars) and `environmentFiles` (secret files) are merged into `$CAESAR_HOME/.env` at activation time (`nixos-rebuild switch`). Caesar reads this file on every startup, so changes take effect with a `systemctl restart caesar-agent` — no container recreation needed.
 
 ### sops-nix
 
 ```nix
 {
   sops = {
-    defaultSopsFile = ./secrets/hermes.yaml;
+    defaultSopsFile = ./secrets/caesar.yaml;
     age.keyFile = "/home/user/.config/sops/age/keys.txt";
-    secrets."hermes-env" = { format = "yaml"; };
+    secrets."caesar-env" = { format = "yaml"; };
   };
 
-  services.hermes-agent.environmentFiles = [
-    config.sops.secrets."hermes-env".path
+  services.caesar-agent.environmentFiles = [
+    config.sops.secrets."caesar-env".path
   ];
 }
 ```
@@ -320,8 +320,8 @@ Both `environment` (non-secret vars) and `environmentFiles` (secret files) are m
 The secrets file contains key-value pairs:
 
 ```yaml
-# secrets/hermes.yaml (encrypted with sops)
-hermes-env: |
+# secrets/caesar.yaml (encrypted with sops)
+caesar-env: |
     OPENROUTER_API_KEY=sk-or-...
     TELEGRAM_BOT_TOKEN=123456:ABC...
     ANTHROPIC_API_KEY=sk-ant-...
@@ -331,10 +331,10 @@ hermes-env: |
 
 ```nix
 {
-  age.secrets.hermes-env.file = ./secrets/hermes-env.age;
+  age.secrets.caesar-env.file = ./secrets/caesar-env.age;
 
-  services.hermes-agent.environmentFiles = [
-    config.age.secrets.hermes-env.path
+  services.caesar-agent.environmentFiles = [
+    config.age.secrets.caesar-env.path
   ];
 }
 ```
@@ -345,8 +345,8 @@ For platforms requiring OAuth (e.g., Discord), use `authFile` to seed credential
 
 ```nix
 {
-  services.hermes-agent = {
-    authFile = config.sops.secrets."hermes/auth.json".path;
+  services.caesar-agent = {
+    authFile = config.sops.secrets."caesar/auth.json".path;
     # authFileForceOverwrite = true;  # overwrite on every activation
   };
 }
@@ -358,15 +358,15 @@ The file is only copied if `auth.json` doesn't already exist (unless `authFileFo
 
 ## Documents
 
-The `documents` option installs files into the agent's working directory (the `workingDirectory`, which the agent reads as its workspace). Hermes looks for specific filenames by convention:
+The `documents` option installs files into the agent's working directory (the `workingDirectory`, which the agent reads as its workspace). Caesar looks for specific filenames by convention:
 
-- **`SOUL.md`** — the agent's system prompt / personality. Hermes reads this on startup and uses it as persistent instructions that shape its behavior across all conversations.
+- **`SOUL.md`** — the agent's system prompt / personality. Caesar reads this on startup and uses it as persistent instructions that shape its behavior across all conversations.
 - **`USER.md`** — context about the user the agent is interacting with.
 - Any other files you place here are visible to the agent as workspace files.
 
 ```nix
 {
-  services.hermes-agent.documents = {
+  services.caesar-agent.documents = {
     "SOUL.md" = ''
       You are a helpful research assistant specializing in NixOS packaging.
       Always cite sources and prefer reproducible solutions.
@@ -388,7 +388,7 @@ The `mcpServers` option declaratively configures [MCP (Model Context Protocol)](
 
 ```nix
 {
-  services.hermes-agent.mcpServers = {
+  services.caesar-agent.mcpServers = {
     filesystem = {
       command = "npx";
       args = [ "-y" "@modelcontextprotocol/server-filesystem" "/data/workspace" ];
@@ -403,14 +403,14 @@ The `mcpServers` option declaratively configures [MCP (Model Context Protocol)](
 ```
 
 :::tip
-Environment variables in `env` values are resolved from `$HERMES_HOME/.env` at runtime. Use `environmentFiles` to inject secrets — never put tokens directly in Nix config.
+Environment variables in `env` values are resolved from `$CAESAR_HOME/.env` at runtime. Use `environmentFiles` to inject secrets — never put tokens directly in Nix config.
 :::
 
 ### HTTP Transport (Remote Servers)
 
 ```nix
 {
-  services.hermes-agent.mcpServers.remote-api = {
+  services.caesar-agent.mcpServers.remote-api = {
     url = "https://mcp.example.com/v1/mcp";
     headers.Authorization = "Bearer \${MCP_REMOTE_API_KEY}";
     timeout = 180;
@@ -420,34 +420,34 @@ Environment variables in `env` values are resolved from `$HERMES_HOME/.env` at r
 
 ### HTTP Transport with OAuth
 
-Set `auth = "oauth"` for servers using OAuth 2.1. Hermes implements the full PKCE flow — metadata discovery, dynamic client registration, token exchange, and automatic refresh.
+Set `auth = "oauth"` for servers using OAuth 2.1. Caesar implements the full PKCE flow — metadata discovery, dynamic client registration, token exchange, and automatic refresh.
 
 ```nix
 {
-  services.hermes-agent.mcpServers.my-oauth-server = {
+  services.caesar-agent.mcpServers.my-oauth-server = {
     url = "https://mcp.example.com/mcp";
     auth = "oauth";
   };
 }
 ```
 
-Tokens are stored in `$HERMES_HOME/mcp-tokens/<server-name>.json` and persist across restarts and rebuilds.
+Tokens are stored in `$CAESAR_HOME/mcp-tokens/<server-name>.json` and persist across restarts and rebuilds.
 
 <details>
 <summary><strong>Initial OAuth authorization on headless servers</strong></summary>
 
-The first OAuth authorization requires a browser-based consent flow. In a headless deployment, Hermes prints the authorization URL to stdout/logs instead of opening a browser.
+The first OAuth authorization requires a browser-based consent flow. In a headless deployment, Caesar prints the authorization URL to stdout/logs instead of opening a browser.
 
-**Option A: Interactive bootstrap** — run the flow once via `docker exec` (container) or `sudo -u hermes` (native):
+**Option A: Interactive bootstrap** — run the flow once via `docker exec` (container) or `sudo -u caesar` (native):
 
 ```bash
 # Container mode
-docker exec -it hermes-agent \
-  hermes mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
+docker exec -it caesar-agent \
+  caesar mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
 
 # Native mode
-sudo -u hermes HERMES_HOME=/var/lib/hermes/.hermes \
-  hermes mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
+sudo -u caesar CAESAR_HOME=/var/lib/caesar/.caesar \
+  caesar mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
 ```
 
 The container uses `--network=host`, so the OAuth callback listener on `127.0.0.1` is reachable from the host browser.
@@ -455,10 +455,10 @@ The container uses `--network=host`, so the OAuth callback listener on `127.0.0.
 **Option B: Pre-seed tokens** — complete the flow on a workstation, then copy tokens:
 
 ```bash
-hermes mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
-scp ~/.hermes/mcp-tokens/my-oauth-server{,.client}.json \
-    server:/var/lib/hermes/.hermes/mcp-tokens/
-# Ensure: chown hermes:hermes, chmod 0600
+caesar mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
+scp ~/.caesar/mcp-tokens/my-oauth-server{,.client}.json \
+    server:/var/lib/caesar/.caesar/mcp-tokens/
+# Ensure: chown caesar:caesar, chmod 0600
 ```
 
 </details>
@@ -469,7 +469,7 @@ Some MCP servers can request LLM completions from the agent:
 
 ```nix
 {
-  services.hermes-agent.mcpServers.analysis = {
+  services.caesar-agent.mcpServers.analysis = {
     command = "npx";
     args = [ "-y" "analysis-server" ];
     sampling = {
@@ -487,20 +487,20 @@ Some MCP servers can request LLM completions from the agent:
 
 ## Managed Mode
 
-When hermes runs via the NixOS module, the following CLI commands are **blocked** with a descriptive error pointing you to `configuration.nix`:
+When caesar runs via the NixOS module, the following CLI commands are **blocked** with a descriptive error pointing you to `configuration.nix`:
 
 | Blocked command | Why |
 |---|---|
-| `hermes setup` | Config is declarative — edit `settings` in your Nix config |
-| `hermes config edit` | Config is generated from `settings` |
-| `hermes config set <key> <value>` | Config is generated from `settings` |
-| `hermes gateway install` | The systemd service is managed by NixOS |
-| `hermes gateway uninstall` | The systemd service is managed by NixOS |
+| `caesar setup` | Config is declarative — edit `settings` in your Nix config |
+| `caesar config edit` | Config is generated from `settings` |
+| `caesar config set <key> <value>` | Config is generated from `settings` |
+| `caesar gateway install` | The systemd service is managed by NixOS |
+| `caesar gateway uninstall` | The systemd service is managed by NixOS |
 
 This prevents drift between what Nix declares and what's on disk. Detection uses two signals:
 
-1. **`HERMES_MANAGED=true`** environment variable — set by the systemd service, visible to the gateway process
-2. **`.managed` marker file** in `HERMES_HOME` — set by the activation script, visible to interactive shells (e.g., `docker exec -it hermes-agent hermes config set ...` is also blocked)
+1. **`CAESAR_MANAGED=true`** environment variable — set by the systemd service, visible to the gateway process
+2. **`.managed` marker file** in `CAESAR_HOME` — set by the activation script, visible to interactive shells (e.g., `docker exec -it caesar-agent caesar config set ...` is also blocked)
 
 To change configuration, edit your Nix config and run `sudo nixos-rebuild switch`.
 
@@ -512,23 +512,23 @@ To change configuration, edit your Nix config and run `sudo nixos-rebuild switch
 This section is only relevant if you're using `container.enable = true`. Skip it for native mode deployments.
 :::
 
-When container mode is enabled, hermes runs inside a persistent Ubuntu container with the Nix-built binary bind-mounted read-only from the host:
+When container mode is enabled, caesar runs inside a persistent Ubuntu container with the Nix-built binary bind-mounted read-only from the host:
 
 ```
 Host                                    Container
 ────                                    ─────────
-/nix/store/...-hermes-agent-0.1.0  ──►  /nix/store/... (ro)
-/var/lib/hermes/                    ──►  /data/          (rw)
+/nix/store/...-caesar-agent-0.1.0  ──►  /nix/store/... (ro)
+/var/lib/caesar/                    ──►  /data/          (rw)
   ├── current-package -> /nix/store/...    (symlink, updated each rebuild)
   ├── .gc-root -> /nix/store/...           (prevents nix-collect-garbage)
   ├── .container-identity                  (sha256 hash, triggers recreation)
-  ├── .hermes/                             (HERMES_HOME)
+  ├── .caesar/                             (CAESAR_HOME)
   │   ├── .env                             (merged from environment + environmentFiles)
   │   ├── config.yaml                      (Nix-generated, deep-merged by activation)
   │   ├── .managed                         (marker file)
   │   ├── state.db, sessions/, memories/   (runtime state)
   │   └── mcp-tokens/                      (OAuth tokens for MCP servers)
-  ├── home/                                ──►  /home/hermes    (rw)
+  ├── home/                                ──►  /home/caesar    (rw)
   └── workspace/                           (MESSAGING_CWD)
       ├── SOUL.md                          (from documents option)
       └── (agent-created files)
@@ -536,13 +536,13 @@ Host                                    Container
 Container writable layer (apt/pip/npm):   /usr, /usr/local, /tmp
 ```
 
-The Nix-built binary works inside the Ubuntu container because `/nix/store` is bind-mounted — it brings its own interpreter and all dependencies, so there's no reliance on the container's system libraries. The container entrypoint resolves through a `current-package` symlink: `/data/current-package/bin/hermes gateway run --replace`. On `nixos-rebuild switch`, only the symlink is updated — the container keeps running.
+The Nix-built binary works inside the Ubuntu container because `/nix/store` is bind-mounted — it brings its own interpreter and all dependencies, so there's no reliance on the container's system libraries. The container entrypoint resolves through a `current-package` symlink: `/data/current-package/bin/caesar gateway run --replace`. On `nixos-rebuild switch`, only the symlink is updated — the container keeps running.
 
 ### What Persists Across What
 
-| Event | Container recreated? | `/data` (state) | `/home/hermes` | Writable layer (`apt`/`pip`/`npm`) |
+| Event | Container recreated? | `/data` (state) | `/home/caesar` | Writable layer (`apt`/`pip`/`npm`) |
 |---|---|---|---|---|
-| `systemctl restart hermes-agent` | No | Persists | Persists | Persists |
+| `systemctl restart caesar-agent` | No | Persists | Persists | Persists |
 | `nixos-rebuild switch` (code change) | No (symlink updated) | Persists | Persists | Persists |
 | Host reboot | No | Persists | Persists | Persists |
 | `nix-collect-garbage` | No (GC root) | Persists | Persists | Persists |
@@ -550,17 +550,17 @@ The Nix-built binary works inside the Ubuntu container because `/nix/store` is b
 | Volume/options change | **Yes** | Persists | Persists | **Lost** |
 | `environment`/`environmentFiles` change | No | Persists | Persists | Persists |
 
-The container is only recreated when its **identity hash** changes. The hash covers: schema version, image, `extraVolumes`, `extraOptions`, and the entrypoint script. Changes to environment variables, settings, documents, or the hermes package itself do **not** trigger recreation.
+The container is only recreated when its **identity hash** changes. The hash covers: schema version, image, `extraVolumes`, `extraOptions`, and the entrypoint script. Changes to environment variables, settings, documents, or the caesar package itself do **not** trigger recreation.
 
 :::warning Writable layer loss
-When the identity hash changes (image upgrade, new volumes, new container options), the container is destroyed and recreated from a fresh pull of `container.image`. Any `apt install`, `pip install`, or `npm install` packages in the writable layer are lost. State in `/data` and `/home/hermes` is preserved (these are bind mounts).
+When the identity hash changes (image upgrade, new volumes, new container options), the container is destroyed and recreated from a fresh pull of `container.image`. Any `apt install`, `pip install`, or `npm install` packages in the writable layer are lost. State in `/data` and `/home/caesar` is preserved (these are bind mounts).
 
-If the agent relies on specific packages, consider baking them into a custom image (`container.image = "my-registry/hermes-base:latest"`) or scripting their installation in the agent's SOUL.md.
+If the agent relies on specific packages, consider baking them into a custom image (`container.image = "my-registry/caesar-base:latest"`) or scripting their installation in the agent's SOUL.md.
 :::
 
 ### GC Root Protection
 
-The `preStart` script creates a GC root at `${stateDir}/.gc-root` pointing to the current hermes package. This prevents `nix-collect-garbage` from removing the running binary. If the GC root somehow breaks, restarting the service recreates it.
+The `preStart` script creates a GC root at `${stateDir}/.gc-root` pointing to the current caesar package. This prevents `nix-collect-garbage` from removing the running binary. If the GC root somehow breaks, restarting the service recreates it.
 
 ---
 
@@ -571,7 +571,7 @@ The `preStart` script creates a GC root at `${stateDir}/.gc-root` pointing to th
 The flake provides a development shell with Python 3.11, uv, Node.js, and all runtime tools:
 
 ```bash
-cd hermes-agent
+cd caesar-agent
 nix develop
 
 # Shell provides:
@@ -579,8 +579,8 @@ nix develop
 #   - Node.js 20, ripgrep, git, openssh, ffmpeg on PATH
 #   - Stamp-file optimization: re-entry is near-instant if deps haven't changed
 
-hermes setup
-hermes chat
+caesar setup
+caesar chat
 ```
 
 ### direnv (Recommended)
@@ -588,7 +588,7 @@ hermes chat
 The included `.envrc` activates the dev shell automatically:
 
 ```bash
-cd hermes-agent
+cd caesar-agent
 direnv allow    # one-time
 # Subsequent entries are near-instant (stamp file skips dep install)
 ```
@@ -605,7 +605,7 @@ nix flake check
 nix build .#checks.x86_64-linux.package-contents   # binaries exist + version
 nix build .#checks.x86_64-linux.entry-points-sync  # pyproject.toml ↔ Nix package sync
 nix build .#checks.x86_64-linux.cli-commands        # gateway/config subcommands
-nix build .#checks.x86_64-linux.managed-guard       # HERMES_MANAGED blocks mutation
+nix build .#checks.x86_64-linux.managed-guard       # CAESAR_MANAGED blocks mutation
 nix build .#checks.x86_64-linux.bundled-skills      # skills present in package
 nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves user keys
 ```
@@ -615,11 +615,11 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Check | What it tests |
 |---|---|
-| `package-contents` | `hermes` and `hermes-agent` binaries exist and `hermes version` runs |
+| `package-contents` | `caesar` and `caesar-agent` binaries exist and `caesar version` runs |
 | `entry-points-sync` | Every `[project.scripts]` entry in `pyproject.toml` has a wrapped binary in the Nix package |
-| `cli-commands` | `hermes --help` exposes `gateway` and `config` subcommands |
-| `managed-guard` | `HERMES_MANAGED=true hermes config set ...` prints the NixOS error |
-| `bundled-skills` | Skills directory exists, contains SKILL.md files, `HERMES_BUNDLED_SKILLS` is set in wrapper |
+| `cli-commands` | `caesar --help` exposes `gateway` and `config` subcommands |
+| `managed-guard` | `CAESAR_MANAGED=true caesar config set ...` prints the NixOS error |
+| `bundled-skills` | Skills directory exists, contains SKILL.md files, `CAESAR_BUNDLED_SKILLS` is set in wrapper |
 | `config-roundtrip` | 7 merge scenarios: fresh install, Nix override, user key preservation, mixed merge, MCP additive merge, nested deep merge, idempotency |
 
 </details>
@@ -632,14 +632,14 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `enable` | `bool` | `false` | Enable the hermes-agent service |
-| `package` | `package` | `hermes-agent` | The hermes-agent package to use |
-| `user` | `str` | `"hermes"` | System user |
-| `group` | `str` | `"hermes"` | System group |
+| `enable` | `bool` | `false` | Enable the caesar-agent service |
+| `package` | `package` | `caesar-agent` | The caesar-agent package to use |
+| `user` | `str` | `"caesar"` | System user |
+| `group` | `str` | `"caesar"` | System group |
 | `createUser` | `bool` | `true` | Auto-create user/group |
-| `stateDir` | `str` | `"/var/lib/hermes"` | State directory (`HERMES_HOME` parent) |
+| `stateDir` | `str` | `"/var/lib/caesar"` | State directory (`CAESAR_HOME` parent) |
 | `workingDirectory` | `str` | `"${stateDir}/workspace"` | Agent working directory (`MESSAGING_CWD`) |
-| `addToSystemPackages` | `bool` | `false` | Add `hermes` CLI to system PATH and set `HERMES_HOME` system-wide |
+| `addToSystemPackages` | `bool` | `false` | Add `caesar` CLI to system PATH and set `CAESAR_HOME` system-wide |
 
 ### Configuration
 
@@ -652,7 +652,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `environmentFiles` | `listOf str` | `[]` | Paths to env files with secrets. Merged into `$HERMES_HOME/.env` at activation time |
+| `environmentFiles` | `listOf str` | `[]` | Paths to env files with secrets. Merged into `$CAESAR_HOME/.env` at activation time |
 | `environment` | `attrsOf str` | `{}` | Non-secret env vars. **Visible in Nix store** — do not put secrets here |
 | `authFile` | `null` or `path` | `null` | OAuth credentials seed. Only copied on first deploy |
 | `authFileForceOverwrite` | `bool` | `false` | Always overwrite `auth.json` from `authFile` on activation |
@@ -684,7 +684,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `extraArgs` | `listOf str` | `[]` | Extra args for `hermes gateway` |
+| `extraArgs` | `listOf str` | `[]` | Extra args for `caesar gateway` |
 | `extraPackages` | `listOf package` | `[]` | Extra packages on service PATH (native mode only) |
 | `restart` | `str` | `"always"` | systemd `Restart=` policy |
 | `restartSec` | `int` | `5` | systemd `RestartSec=` value |
@@ -706,8 +706,8 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 ### Native Mode
 
 ```
-/var/lib/hermes/                     # stateDir (owned by hermes:hermes, 0750)
-├── .hermes/                         # HERMES_HOME
+/var/lib/caesar/                     # stateDir (owned by caesar:caesar, 0750)
+├── .caesar/                         # CAESAR_HOME
 │   ├── config.yaml                  # Nix-generated (deep-merged each rebuild)
 │   ├── .managed                     # Marker: CLI config mutation blocked
 │   ├── .env                         # Merged from environment + environmentFiles
@@ -732,9 +732,9 @@ Same layout, mounted into the container:
 
 | Container path | Host path | Mode | Notes |
 |---|---|---|---|
-| `/nix/store` | `/nix/store` | `ro` | Hermes binary + all Nix deps |
-| `/data` | `/var/lib/hermes` | `rw` | All state, config, workspace |
-| `/home/hermes` | `${stateDir}/home` | `rw` | Persistent agent home — `pip install --user`, tool caches |
+| `/nix/store` | `/nix/store` | `ro` | Caesar binary + all Nix deps |
+| `/data` | `/var/lib/caesar` | `rw` | All state, config, workspace |
+| `/home/caesar` | `${stateDir}/home` | `rw` | Persistent agent home — `pip install --user`, tool caches |
 | `/usr`, `/usr/local`, `/tmp` | (writable layer) | `rw` | `apt`/`pip`/`npm` installs — persists across restarts, lost on recreation |
 
 ---
@@ -743,7 +743,7 @@ Same layout, mounted into the container:
 
 ```bash
 # Update the flake input
-nix flake update hermes-agent --flake /etc/nixos
+nix flake update caesar-agent --flake /etc/nixos
 
 # Rebuild
 sudo nixos-rebuild switch
@@ -763,21 +763,21 @@ All `docker` commands below work the same with `podman`. Substitute accordingly 
 
 ```bash
 # Both modes use the same systemd unit
-journalctl -u hermes-agent -f
+journalctl -u caesar-agent -f
 
 # Container mode: also available directly
-docker logs -f hermes-agent
+docker logs -f caesar-agent
 ```
 
 ### Container Inspection
 
 ```bash
-systemctl status hermes-agent
-docker ps -a --filter name=hermes-agent
-docker inspect hermes-agent --format='{{.State.Status}}'
-docker exec -it hermes-agent bash
-docker exec hermes-agent readlink /data/current-package
-docker exec hermes-agent cat /data/.container-identity
+systemctl status caesar-agent
+docker ps -a --filter name=caesar-agent
+docker inspect caesar-agent --format='{{.State.Status}}'
+docker exec -it caesar-agent bash
+docker exec caesar-agent readlink /data/current-package
+docker exec caesar-agent cat /data/.container-identity
 ```
 
 ### Force Container Recreation
@@ -785,10 +785,10 @@ docker exec hermes-agent cat /data/.container-identity
 If you need to reset the writable layer (fresh Ubuntu):
 
 ```bash
-sudo systemctl stop hermes-agent
-docker rm -f hermes-agent
-sudo rm /var/lib/hermes/.container-identity
-sudo systemctl start hermes-agent
+sudo systemctl stop caesar-agent
+docker rm -f caesar-agent
+sudo rm /var/lib/caesar/.container-identity
+sudo systemctl start caesar-agent
 ```
 
 ### Verify Secrets Are Loaded
@@ -797,16 +797,16 @@ If the agent starts but can't authenticate with the LLM provider, check that the
 
 ```bash
 # Native mode
-sudo -u hermes cat /var/lib/hermes/.hermes/.env
+sudo -u caesar cat /var/lib/caesar/.caesar/.env
 
 # Container mode
-docker exec hermes-agent cat /data/.hermes/.env
+docker exec caesar-agent cat /data/.caesar/.env
 ```
 
 ### GC Root Verification
 
 ```bash
-nix-store --query --roots $(docker exec hermes-agent readlink /data/current-package)
+nix-store --query --roots $(docker exec caesar-agent readlink /data/current-package)
 ```
 
 ### Common Issues
@@ -815,6 +815,6 @@ nix-store --query --roots $(docker exec hermes-agent readlink /data/current-pack
 |---|---|---|
 | `Cannot save configuration: managed by NixOS` | CLI guards active | Edit `configuration.nix` and `nixos-rebuild switch` |
 | Container recreated unexpectedly | `extraVolumes`, `extraOptions`, or `image` changed | Expected — writable layer resets. Reinstall packages or use a custom image |
-| `hermes version` shows old version | Container not restarted | `systemctl restart hermes-agent` |
-| Permission denied on `/var/lib/hermes` | State dir is `0750 hermes:hermes` | Use `docker exec` or `sudo -u hermes` |
-| `nix-collect-garbage` removed hermes | GC root missing | Restart the service (preStart recreates the GC root) |
+| `caesar version` shows old version | Container not restarted | `systemctl restart caesar-agent` |
+| Permission denied on `/var/lib/caesar` | State dir is `0750 caesar:caesar` | Use `docker exec` or `sudo -u caesar` |
+| `nix-collect-garbage` removed caesar | GC root missing | Restart the service (preStart recreates the GC root) |

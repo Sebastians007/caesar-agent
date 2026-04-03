@@ -1,24 +1,24 @@
 ---
 sidebar_position: 11
 title: "Feishu / Lark"
-description: "Set up Hermes Agent as a Feishu or Lark bot"
+description: "Set up Caesar Agent as a Feishu or Lark bot"
 ---
 
 # Feishu / Lark Setup
 
-Hermes Agent integrates with Feishu and Lark as a full-featured bot. Once connected, you can chat with the agent in direct messages or group chats, receive cron job results in a home chat, and send text, images, audio, and file attachments through the normal gateway flow.
+Caesar Agent integrates with Feishu and Lark as a full-featured bot. Once connected, you can chat with the agent in direct messages or group chats, receive cron job results in a home chat, and send text, images, audio, and file attachments through the normal gateway flow.
 
 The integration supports both connection modes:
 
-- `websocket` — recommended; Hermes opens the outbound connection and you do not need a public webhook endpoint
+- `websocket` — recommended; Caesar opens the outbound connection and you do not need a public webhook endpoint
 - `webhook` — useful when you want Feishu/Lark to push events into your gateway over HTTP
 
-## How Hermes Behaves
+## How Caesar Behaves
 
 | Context | Behavior |
 |---------|----------|
-| Direct messages | Hermes responds to every message. |
-| Group chats | Hermes responds only when the bot is @mentioned in the chat. |
+| Direct messages | Caesar responds to every message. |
+| Group chats | Caesar responds only when the bot is @mentioned in the chat. |
 | Shared group chats | By default, session history is isolated per user inside a shared chat. |
 
 This shared-chat behavior is controlled by `config.yaml`:
@@ -46,7 +46,7 @@ Keep the App Secret private. Anyone with it can impersonate your app.
 
 ### Recommended: WebSocket mode
 
-Use WebSocket mode when Hermes runs on your laptop, workstation, or a private server. No public URL is required. The official Lark SDK opens and maintains a persistent outbound WebSocket connection with automatic reconnection.
+Use WebSocket mode when Caesar runs on your laptop, workstation, or a private server. No public URL is required. The official Lark SDK opens and maintains a persistent outbound WebSocket connection with automatic reconnection.
 
 ```bash
 FEISHU_CONNECTION_MODE=websocket
@@ -58,13 +58,13 @@ FEISHU_CONNECTION_MODE=websocket
 
 ### Optional: Webhook mode
 
-Use webhook mode only when you already run Hermes behind a reachable HTTP endpoint.
+Use webhook mode only when you already run Caesar behind a reachable HTTP endpoint.
 
 ```bash
 FEISHU_CONNECTION_MODE=webhook
 ```
 
-In webhook mode, Hermes starts an HTTP server (via `aiohttp`) and serves a Feishu endpoint at:
+In webhook mode, Caesar starts an HTTP server (via `aiohttp`) and serves a Feishu endpoint at:
 
 ```text
 /feishu/webhook
@@ -82,19 +82,19 @@ FEISHU_WEBHOOK_PATH=/feishu/webhook  # default: /feishu/webhook
 
 When Feishu sends a URL verification challenge (`type: url_verification`), the webhook responds automatically so you can complete the subscription setup in the Feishu developer console.
 
-## Step 3: Configure Hermes
+## Step 3: Configure Caesar
 
 ### Option A: Interactive Setup
 
 ```bash
-hermes gateway setup
+caesar gateway setup
 ```
 
 Select **Feishu / Lark** and fill in the prompts.
 
 ### Option B: Manual Configuration
 
-Add the following to `~/.hermes/.env`:
+Add the following to `~/.caesar/.env`:
 
 ```bash
 FEISHU_APP_ID=cli_xxx
@@ -115,7 +115,7 @@ FEISHU_HOME_CHANNEL=oc_xxx
 ## Step 4: Start the Gateway
 
 ```bash
-hermes gateway
+caesar gateway
 ```
 
 Then message the bot from Feishu/Lark to confirm that the connection is live.
@@ -176,7 +176,7 @@ Both `FEISHU_ENCRYPT_KEY` and `FEISHU_VERIFICATION_TOKEN` can be used together f
 
 ## Group Message Policy
 
-The `FEISHU_GROUP_POLICY` environment variable controls whether and how Hermes responds in group chats:
+The `FEISHU_GROUP_POLICY` environment variable controls whether and how Caesar responds in group chats:
 
 ```bash
 FEISHU_GROUP_POLICY=allowlist   # default
@@ -184,9 +184,9 @@ FEISHU_GROUP_POLICY=allowlist   # default
 
 | Value | Behavior |
 |-------|----------|
-| `open` | Hermes responds to @mentions from any user in any group. |
-| `allowlist` | Hermes only responds to @mentions from users listed in `FEISHU_ALLOWED_USERS`. |
-| `disabled` | Hermes ignores all group messages entirely. |
+| `open` | Caesar responds to @mentions from any user in any group. |
+| `allowlist` | Caesar only responds to @mentions from users listed in `FEISHU_ALLOWED_USERS`. |
+| `disabled` | Caesar ignores all group messages entirely. |
 
 In all modes, the bot must be explicitly @mentioned (or @all) in the group before the message is processed. Direct messages bypass this gate.
 
@@ -275,9 +275,9 @@ When a user sends multiple text messages in quick succession, they are merged in
 
 | Setting | Env Var | Default |
 |---------|---------|---------|
-| Quiet period | `HERMES_FEISHU_TEXT_BATCH_DELAY_SECONDS` | 0.6s |
-| Max messages per batch | `HERMES_FEISHU_TEXT_BATCH_MAX_MESSAGES` | 8 |
-| Max characters per batch | `HERMES_FEISHU_TEXT_BATCH_MAX_CHARS` | 4000 |
+| Quiet period | `CAESAR_FEISHU_TEXT_BATCH_DELAY_SECONDS` | 0.6s |
+| Max messages per batch | `CAESAR_FEISHU_TEXT_BATCH_MAX_MESSAGES` | 8 |
+| Max characters per batch | `CAESAR_FEISHU_TEXT_BATCH_MAX_CHARS` | 4000 |
 
 ### Media Batching
 
@@ -285,7 +285,7 @@ Multiple media attachments sent in quick succession (e.g., dragging several imag
 
 | Setting | Env Var | Default |
 |---------|---------|---------|
-| Quiet period | `HERMES_FEISHU_MEDIA_BATCH_DELAY_SECONDS` | 0.8s |
+| Quiet period | `CAESAR_FEISHU_MEDIA_BATCH_DELAY_SECONDS` | 0.8s |
 
 ### Per-Chat Serialization
 
@@ -312,11 +312,11 @@ Additional webhook protections:
 
 ## Deduplication
 
-Inbound messages are deduplicated using message IDs with a 24-hour TTL. The dedup state is persisted across restarts to `~/.hermes/feishu_seen_message_ids.json`.
+Inbound messages are deduplicated using message IDs with a 24-hour TTL. The dedup state is persisted across restarts to `~/.caesar/feishu_seen_message_ids.json`.
 
 | Setting | Env Var | Default |
 |---------|---------|---------|
-| Cache size | `HERMES_FEISHU_DEDUP_CACHE_SIZE` | 2048 entries |
+| Cache size | `CAESAR_FEISHU_DEDUP_CACHE_SIZE` | 2048 entries |
 
 ## All Environment Variables
 
@@ -337,11 +337,11 @@ Inbound messages are deduplicated using message IDs with a 24-hour TTL. The dedu
 | `FEISHU_WEBHOOK_HOST` | — | `127.0.0.1` | Webhook server bind address |
 | `FEISHU_WEBHOOK_PORT` | — | `8765` | Webhook server port |
 | `FEISHU_WEBHOOK_PATH` | — | `/feishu/webhook` | Webhook endpoint path |
-| `HERMES_FEISHU_DEDUP_CACHE_SIZE` | — | `2048` | Max deduplicated message IDs to track |
-| `HERMES_FEISHU_TEXT_BATCH_DELAY_SECONDS` | — | `0.6` | Text burst debounce quiet period |
-| `HERMES_FEISHU_TEXT_BATCH_MAX_MESSAGES` | — | `8` | Max messages merged per text batch |
-| `HERMES_FEISHU_TEXT_BATCH_MAX_CHARS` | — | `4000` | Max characters merged per text batch |
-| `HERMES_FEISHU_MEDIA_BATCH_DELAY_SECONDS` | — | `0.8` | Media burst debounce quiet period |
+| `CAESAR_FEISHU_DEDUP_CACHE_SIZE` | — | `2048` | Max deduplicated message IDs to track |
+| `CAESAR_FEISHU_TEXT_BATCH_DELAY_SECONDS` | — | `0.6` | Text burst debounce quiet period |
+| `CAESAR_FEISHU_TEXT_BATCH_MAX_MESSAGES` | — | `8` | Max messages merged per text batch |
+| `CAESAR_FEISHU_TEXT_BATCH_MAX_CHARS` | — | `4000` | Max characters merged per text batch |
+| `CAESAR_FEISHU_MEDIA_BATCH_DELAY_SECONDS` | — | `0.8` | Media burst debounce quiet period |
 
 ## Troubleshooting
 
@@ -350,8 +350,8 @@ Inbound messages are deduplicated using message IDs with a 24-hour TTL. The dedu
 | `lark-oapi not installed` | Install the SDK: `pip install lark-oapi` |
 | `websockets not installed; websocket mode unavailable` | Install websockets: `pip install websockets` |
 | `aiohttp not installed; webhook mode unavailable` | Install aiohttp: `pip install aiohttp` |
-| `FEISHU_APP_ID or FEISHU_APP_SECRET not set` | Set both env vars or configure via `hermes gateway setup` |
-| `Another local Hermes gateway is already using this Feishu app_id` | Only one Hermes instance can use the same app_id at a time. Stop the other gateway first. |
+| `FEISHU_APP_ID or FEISHU_APP_SECRET not set` | Set both env vars or configure via `caesar gateway setup` |
+| `Another local Caesar gateway is already using this Feishu app_id` | Only one Caesar instance can use the same app_id at a time. Stop the other gateway first. |
 | Bot doesn't respond in groups | Ensure the bot is @mentioned, check `FEISHU_GROUP_POLICY`, and verify the sender is in `FEISHU_ALLOWED_USERS` if policy is `allowlist` |
 | `Webhook rejected: invalid verification token` | Ensure `FEISHU_VERIFICATION_TOKEN` matches the token in your Feishu app's Event Subscriptions config |
 | `Webhook rejected: invalid signature` | Ensure `FEISHU_ENCRYPT_KEY` matches the encrypt key in your Feishu app config |
@@ -362,4 +362,4 @@ Inbound messages are deduplicated using message IDs with a 24-hour TTL. The dedu
 
 ## Toolset
 
-Feishu / Lark uses the `hermes-feishu` platform preset, which includes the same core tools as Telegram and other gateway-based messaging platforms.
+Feishu / Lark uses the `caesar-feishu` platform preset, which includes the same core tools as Telegram and other gateway-based messaging platforms.

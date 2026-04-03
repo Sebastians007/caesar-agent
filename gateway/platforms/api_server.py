@@ -2,15 +2,15 @@
 OpenAI-compatible API server platform adapter.
 
 Exposes an HTTP server with endpoints:
-- POST /v1/chat/completions        — OpenAI Chat Completions format (stateless; opt-in session continuity via X-Hermes-Session-Id header)
+- POST /v1/chat/completions        — OpenAI Chat Completions format (stateless; opt-in session continuity via X-Caesar-Session-Id header)
 - POST /v1/responses               — OpenAI Responses API format (stateful via previous_response_id)
 - GET  /v1/responses/{response_id} — Retrieve a stored response
 - DELETE /v1/responses/{response_id} — Delete a stored response
-- GET  /v1/models                  — lists hermes-agent as an available model
+- GET  /v1/models                  — lists caesar-agent as an available model
 - GET  /health                     — health check
 
 Any OpenAI-compatible frontend (Open WebUI, LobeChat, LibreChat,
-AnythingLLM, NextChat, ChatBox, etc.) can connect to hermes-agent
+AnythingLLM, NextChat, ChatBox, etc.) can connect to caesar-agent
 through this adapter by pointing at http://localhost:8642/v1.
 
 Requires:
@@ -69,8 +69,8 @@ class ResponseStore:
         self._max_size = max_size
         if db_path is None:
             try:
-                from hermes_cli.config import get_hermes_home
-                db_path = str(get_hermes_home() / "response_store.db")
+                from caesar_cli.config import get_caesar_home
+                db_path = str(get_caesar_home() / "response_store.db")
             except Exception:
                 db_path = ":memory:"
         try:
@@ -284,7 +284,7 @@ class APIServerAdapter(BasePlatformAdapter):
     OpenAI-compatible HTTP API server adapter.
 
     Runs an aiohttp web server that accepts OpenAI-format requests
-    and routes them through hermes-agent's AIAgent.
+    and routes them through caesar-agent's AIAgent.
     """
 
     def __init__(self, config: PlatformConfig):
@@ -389,11 +389,11 @@ class APIServerAdapter(BasePlatformAdapter):
         Uses _resolve_runtime_agent_kwargs() to pick up model, api_key,
         base_url, etc. from config.yaml / env vars.  Toolsets are resolved
         from config.yaml platform_toolsets.api_server (same as all other
-        gateway platforms), falling back to the hermes-api-server default.
+        gateway platforms), falling back to the caesar-api-server default.
         """
         from run_agent import AIAgent
         from gateway.run import _resolve_runtime_agent_kwargs, _resolve_gateway_model, _load_gateway_config
-        from hermes_cli.tools_config import _get_platform_tools
+        from caesar_cli.tools_config import _get_platform_tools
 
         runtime_kwargs = _resolve_runtime_agent_kwargs()
         model = _resolve_gateway_model()
@@ -401,7 +401,7 @@ class APIServerAdapter(BasePlatformAdapter):
         user_config = _load_gateway_config()
         enabled_toolsets = sorted(_get_platform_tools(user_config, "api_server"))
 
-        max_iterations = int(os.getenv("HERMES_MAX_ITERATIONS", "90"))
+        max_iterations = int(os.getenv("CAESAR_MAX_ITERATIONS", "90"))
 
         agent = AIAgent(
             model=model,
@@ -424,10 +424,10 @@ class APIServerAdapter(BasePlatformAdapter):
 
     async def _handle_health(self, request: "web.Request") -> "web.Response":
         """GET /health — simple health check."""
-        return web.json_response({"status": "ok", "platform": "hermes-agent"})
+        return web.json_response({"status": "ok", "platform": "caesar-agent"})
 
     async def _handle_models(self, request: "web.Request") -> "web.Response":
-        """GET /v1/models — return hermes-agent as an available model."""
+        """GET /v1/models — return caesar-agent as an available model."""
         auth_err = self._check_auth(request)
         if auth_err:
             return auth_err
@@ -436,12 +436,12 @@ class APIServerAdapter(BasePlatformAdapter):
             "object": "list",
             "data": [
                 {
-                    "id": "hermes-agent",
+                    "id": "caesar-agent",
                     "object": "model",
                     "created": int(time.time()),
-                    "owned_by": "hermes",
+                    "owned_by": "caesar",
                     "permission": [],
-                    "root": "hermes-agent",
+                    "root": "caesar-agent",
                     "parent": None,
                 }
             ],
@@ -497,14 +497,14 @@ class APIServerAdapter(BasePlatformAdapter):
                 status=400,
             )
 
-        # Allow caller to continue an existing session by passing X-Hermes-Session-Id.
+        # Allow caller to continue an existing session by passing X-Caesar-Session-Id.
         # When provided, history is loaded from state.db instead of from the request body.
-        provided_session_id = request.headers.get("X-Hermes-Session-Id", "").strip()
+        provided_session_id = request.headers.get("X-Caesar-Session-Id", "").strip()
         if provided_session_id:
             session_id = provided_session_id
             try:
                 if self._session_db is None:
-                    from hermes_state import SessionDB
+                    from caesar_state import SessionDB
                     self._session_db = SessionDB()
                 history = self._session_db.get_messages_as_conversation(session_id)
             except Exception as e:
@@ -515,7 +515,7 @@ class APIServerAdapter(BasePlatformAdapter):
             # history already set from request body above
 
         completion_id = f"chatcmpl-{uuid.uuid4().hex[:29]}"
-        model_name = body.get("model", "hermes-agent")
+        model_name = body.get("model", "caesar-agent")
         created = int(time.time())
 
         if stream:
@@ -616,7 +616,7 @@ class APIServerAdapter(BasePlatformAdapter):
             },
         }
 
-        return web.json_response(response_data, headers={"X-Hermes-Session-Id": session_id})
+        return web.json_response(response_data, headers={"X-Caesar-Session-Id": session_id})
 
     async def _write_sse_chat_completion(
         self, request: "web.Request", completion_id: str, model: str,
@@ -638,7 +638,7 @@ class APIServerAdapter(BasePlatformAdapter):
         if cors:
             sse_headers.update(cors)
         if session_id:
-            sse_headers["X-Hermes-Session-Id"] = session_id
+            sse_headers["X-Caesar-Session-Id"] = session_id
         response = web.StreamResponse(status=200, headers=sse_headers)
         await response.prepare(request)
 
@@ -870,7 +870,7 @@ class APIServerAdapter(BasePlatformAdapter):
             "object": "response",
             "status": "completed",
             "created_at": created_at,
-            "model": body.get("model", "hermes-agent"),
+            "model": body.get("model", "caesar-agent"),
             "output": output_items,
             "usage": {
                 "input_tokens": usage.get("input_tokens", 0),

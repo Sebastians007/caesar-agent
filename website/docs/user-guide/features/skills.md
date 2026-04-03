@@ -8,9 +8,9 @@ description: "On-demand knowledge documents — progressive disclosure, agent-ma
 
 Skills are on-demand knowledge documents the agent can load when needed. They follow a **progressive disclosure** pattern to minimize token usage and are compatible with the [agentskills.io](https://agentskills.io/specification) open standard.
 
-All skills live in **`~/.hermes/skills/`** — the primary directory and source of truth. On fresh install, bundled skills are copied from the repo. Hub-installed and agent-created skills also go here. The agent can modify or delete any skill.
+All skills live in **`~/.caesar/skills/`** — the primary directory and source of truth. On fresh install, bundled skills are copied from the repo. Hub-installed and agent-created skills also go here. The agent can modify or delete any skill.
 
-You can also point Hermes at **external skill directories** — additional folders scanned alongside the local one. See [External Skill Directories](#external-skill-directories) below.
+You can also point Caesar at **external skill directories** — additional folders scanned alongside the local one. See [External Skill Directories](#external-skill-directories) below.
 
 See also:
 
@@ -32,13 +32,13 @@ Every installed skill is automatically available as a slash command:
 /excalidraw
 ```
 
-The bundled `plan` skill is a good example of a skill-backed slash command with custom behavior. Running `/plan [request]` tells Hermes to inspect context if needed, write a markdown implementation plan instead of executing the task, and save the result under `.hermes/plans/` relative to the active workspace/backend working directory.
+The bundled `plan` skill is a good example of a skill-backed slash command with custom behavior. Running `/plan [request]` tells Caesar to inspect context if needed, write a markdown implementation plan instead of executing the task, and save the result under `.caesar/plans/` relative to the active workspace/backend working directory.
 
 You can also interact with skills through natural conversation:
 
 ```bash
-hermes chat --toolsets skills -q "What skills do you have?"
-hermes chat --toolsets skills -q "Show me the axolotl skill"
+caesar chat --toolsets skills -q "What skills do you have?"
+caesar chat --toolsets skills -q "Show me the axolotl skill"
 ```
 
 ## Progressive Disclosure
@@ -62,7 +62,7 @@ description: Brief description of what this skill does
 version: 1.0.0
 platforms: [macos, linux]     # Optional — restrict to specific OS platforms
 metadata:
-  hermes:
+  caesar:
     tags: [python, automation]
     category: devops
     fallback_for_toolsets: [web]    # Optional — conditional activation (see below)
@@ -108,7 +108,7 @@ Skills can automatically show or hide themselves based on which tools are availa
 
 ```yaml
 metadata:
-  hermes:
+  caesar:
     fallback_for_toolsets: [web]      # Show ONLY when these toolsets are unavailable
     requires_toolsets: [terminal]     # Show ONLY when these toolsets are available
     fallback_for_tools: [web_search]  # Show ONLY when these specific tools are unavailable
@@ -138,14 +138,14 @@ required_environment_variables:
     required_for: full functionality
 ```
 
-When a missing value is encountered, Hermes asks for it securely only when the skill is actually loaded in the local CLI. You can skip setup and keep using the skill. Messaging surfaces never ask for secrets in chat — they tell you to use `hermes setup` or `~/.hermes/.env` locally instead.
+When a missing value is encountered, Caesar asks for it securely only when the skill is actually loaded in the local CLI. You can skip setup and keep using the skill. Messaging surfaces never ask for secrets in chat — they tell you to use `caesar setup` or `~/.caesar/.env` locally instead.
 
 Once set, declared env vars are **automatically passed through** to `execute_code` and `terminal` sandboxes — the skill's scripts can use `$TENOR_API_KEY` directly. For non-skill env vars, use the `terminal.env_passthrough` config option. See [Environment Variable Passthrough](/docs/user-guide/security#environment-variable-passthrough) for details.
 
 ## Skill Directory Structure
 
 ```text
-~/.hermes/skills/                  # Single source of truth
+~/.caesar/skills/                  # Single source of truth
 ├── mlops/                         # Category directory
 │   ├── axolotl/
 │   │   ├── SKILL.md               # Main instructions (required)
@@ -168,9 +168,9 @@ Once set, declared env vars are **automatically passed through** to `execute_cod
 
 ## External Skill Directories
 
-If you maintain skills outside of Hermes — for example, a shared `~/.agents/skills/` directory used by multiple AI tools — you can tell Hermes to scan those directories too.
+If you maintain skills outside of Caesar — for example, a shared `~/.agents/skills/` directory used by multiple AI tools — you can tell Caesar to scan those directories too.
 
-Add `external_dirs` under the `skills` section in `~/.hermes/config.yaml`:
+Add `external_dirs` under the `skills` section in `~/.caesar/config.yaml`:
 
 ```yaml
 skills:
@@ -184,15 +184,15 @@ Paths support `~` expansion and `${VAR}` environment variable substitution.
 
 ### How it works
 
-- **Read-only**: External dirs are only scanned for skill discovery. When the agent creates or edits a skill, it always writes to `~/.hermes/skills/`.
+- **Read-only**: External dirs are only scanned for skill discovery. When the agent creates or edits a skill, it always writes to `~/.caesar/skills/`.
 - **Local precedence**: If the same skill name exists in both the local dir and an external dir, the local version wins.
 - **Full integration**: External skills appear in the system prompt index, `skills_list`, `skill_view`, and as `/skill-name` slash commands — no different from local skills.
-- **Non-existent paths are silently skipped**: If a configured directory doesn't exist, Hermes ignores it without errors. Useful for optional shared directories that may not be present on every machine.
+- **Non-existent paths are silently skipped**: If a configured directory doesn't exist, Caesar ignores it without errors. Useful for optional shared directories that may not be present on every machine.
 
 ### Example
 
 ```text
-~/.hermes/skills/               # Local (primary, read-write)
+~/.caesar/skills/               # Local (primary, read-write)
 ├── devops/deploy-k8s/
 │   └── SKILL.md
 └── mlops/axolotl/
@@ -240,56 +240,56 @@ Browse, search, install, and manage skills from online registries, `skills.sh`, 
 ### Common commands
 
 ```bash
-hermes skills browse                              # Browse all hub skills (official first)
-hermes skills browse --source official            # Browse only official optional skills
-hermes skills search kubernetes                   # Search all sources
-hermes skills search react --source skills-sh     # Search the skills.sh directory
-hermes skills search https://mintlify.com/docs --source well-known
-hermes skills inspect openai/skills/k8s           # Preview before installing
-hermes skills install openai/skills/k8s           # Install with security scan
-hermes skills install official/security/1password
-hermes skills install skills-sh/vercel-labs/json-render/json-render-react --force
-hermes skills install well-known:https://mintlify.com/docs/.well-known/skills/mintlify
-hermes skills list --source hub                   # List hub-installed skills
-hermes skills check                               # Check installed hub skills for upstream updates
-hermes skills update                              # Reinstall hub skills with upstream changes when needed
-hermes skills audit                               # Re-scan all hub skills for security
-hermes skills uninstall k8s                       # Remove a hub skill
-hermes skills publish skills/my-skill --to github --repo owner/repo
-hermes skills snapshot export setup.json          # Export skill config
-hermes skills tap add myorg/skills-repo           # Add a custom GitHub source
+caesar skills browse                              # Browse all hub skills (official first)
+caesar skills browse --source official            # Browse only official optional skills
+caesar skills search kubernetes                   # Search all sources
+caesar skills search react --source skills-sh     # Search the skills.sh directory
+caesar skills search https://mintlify.com/docs --source well-known
+caesar skills inspect openai/skills/k8s           # Preview before installing
+caesar skills install openai/skills/k8s           # Install with security scan
+caesar skills install official/security/1password
+caesar skills install skills-sh/vercel-labs/json-render/json-render-react --force
+caesar skills install well-known:https://mintlify.com/docs/.well-known/skills/mintlify
+caesar skills list --source hub                   # List hub-installed skills
+caesar skills check                               # Check installed hub skills for upstream updates
+caesar skills update                              # Reinstall hub skills with upstream changes when needed
+caesar skills audit                               # Re-scan all hub skills for security
+caesar skills uninstall k8s                       # Remove a hub skill
+caesar skills publish skills/my-skill --to github --repo owner/repo
+caesar skills snapshot export setup.json          # Export skill config
+caesar skills tap add myorg/skills-repo           # Add a custom GitHub source
 ```
 
 ### Supported hub sources
 
 | Source | Example | Notes |
 |--------|---------|-------|
-| `official` | `official/security/1password` | Optional skills shipped with Hermes. |
-| `skills-sh` | `skills-sh/vercel-labs/agent-skills/vercel-react-best-practices` | Searchable via `hermes skills search <query> --source skills-sh`. Hermes resolves alias-style skills when the skills.sh slug differs from the repo folder. |
+| `official` | `official/security/1password` | Optional skills shipped with Caesar. |
+| `skills-sh` | `skills-sh/vercel-labs/agent-skills/vercel-react-best-practices` | Searchable via `caesar skills search <query> --source skills-sh`. Caesar resolves alias-style skills when the skills.sh slug differs from the repo folder. |
 | `well-known` | `well-known:https://mintlify.com/docs/.well-known/skills/mintlify` | Skills served directly from `/.well-known/skills/index.json` on a website. Search using the site or docs URL. |
 | `github` | `openai/skills/k8s` | Direct GitHub repo/path installs and custom taps. |
 | `clawhub`, `lobehub`, `claude-marketplace` | Source-specific identifiers | Community or marketplace integrations. |
 
 ### Integrated hubs and registries
 
-Hermes currently integrates with these skills ecosystems and discovery sources:
+Caesar currently integrates with these skills ecosystems and discovery sources:
 
 #### 1. Official optional skills (`official`)
 
-These are maintained in the Hermes repository itself and install with builtin trust.
+These are maintained in the Caesar repository itself and install with builtin trust.
 
 - Catalog: [Official Optional Skills Catalog](../../reference/optional-skills-catalog)
 - Source in repo: `optional-skills/`
 - Example:
 
 ```bash
-hermes skills browse --source official
-hermes skills install official/security/1password
+caesar skills browse --source official
+caesar skills install official/security/1password
 ```
 
 #### 2. skills.sh (`skills-sh`)
 
-This is Vercel's public skills directory. Hermes can search it directly, inspect skill detail pages, resolve alias-style slugs, and install from the underlying source repo.
+This is Vercel's public skills directory. Caesar can search it directly, inspect skill detail pages, resolve alias-style slugs, and install from the underlying source repo.
 
 - Directory: [skills.sh](https://skills.sh/)
 - CLI/tooling repo: [vercel-labs/skills](https://github.com/vercel-labs/skills)
@@ -297,9 +297,9 @@ This is Vercel's public skills directory. Hermes can search it directly, inspect
 - Example:
 
 ```bash
-hermes skills search react --source skills-sh
-hermes skills inspect skills-sh/vercel-labs/json-render/json-render-react
-hermes skills install skills-sh/vercel-labs/json-render/json-render-react --force
+caesar skills search react --source skills-sh
+caesar skills inspect skills-sh/vercel-labs/json-render/json-render-react
+caesar skills install skills-sh/vercel-labs/json-render/json-render-react --force
 ```
 
 #### 3. Well-known skill endpoints (`well-known`)
@@ -311,14 +311,14 @@ This is URL-based discovery from sites that publish `/.well-known/skills/index.j
 - Example:
 
 ```bash
-hermes skills search https://mintlify.com/docs --source well-known
-hermes skills inspect well-known:https://mintlify.com/docs/.well-known/skills/mintlify
-hermes skills install well-known:https://mintlify.com/docs/.well-known/skills/mintlify
+caesar skills search https://mintlify.com/docs --source well-known
+caesar skills inspect well-known:https://mintlify.com/docs/.well-known/skills/mintlify
+caesar skills install well-known:https://mintlify.com/docs/.well-known/skills/mintlify
 ```
 
 #### 4. Direct GitHub skills (`github`)
 
-Hermes can install directly from GitHub repositories and GitHub-based taps. This is useful when you already know the repo/path or want to add your own custom source repo.
+Caesar can install directly from GitHub repositories and GitHub-based taps. This is useful when you already know the repo/path or want to add your own custom source repo.
 
 Default taps (browsable without any setup):
 - [openai/skills](https://github.com/openai/skills)
@@ -329,8 +329,8 @@ Default taps (browsable without any setup):
 - Example:
 
 ```bash
-hermes skills install openai/skills/k8s
-hermes skills tap add myorg/skills-repo
+caesar skills install openai/skills/k8s
+caesar skills tap add myorg/skills-repo
 ```
 
 #### 5. ClawHub (`clawhub`)
@@ -338,32 +338,32 @@ hermes skills tap add myorg/skills-repo
 A third-party skills marketplace integrated as a community source.
 
 - Site: [clawhub.ai](https://clawhub.ai/)
-- Hermes source id: `clawhub`
+- Caesar source id: `clawhub`
 
 #### 6. Claude marketplace-style repos (`claude-marketplace`)
 
-Hermes supports marketplace repos that publish Claude-compatible plugin/marketplace manifests.
+Caesar supports marketplace repos that publish Claude-compatible plugin/marketplace manifests.
 
 Known integrated sources include:
 - [anthropics/skills](https://github.com/anthropics/skills)
 - [aiskillstore/marketplace](https://github.com/aiskillstore/marketplace)
 
-Hermes source id: `claude-marketplace`
+Caesar source id: `claude-marketplace`
 
 #### 7. LobeHub (`lobehub`)
 
-Hermes can search and convert agent entries from LobeHub's public catalog into installable Hermes skills.
+Caesar can search and convert agent entries from LobeHub's public catalog into installable Caesar skills.
 
 - Site: [LobeHub](https://lobehub.com/)
 - Public agents index: [chat-agents.lobehub.com](https://chat-agents.lobehub.com/)
 - Backing repo: [lobehub/lobe-chat-agents](https://github.com/lobehub/lobe-chat-agents)
-- Hermes source id: `lobehub`
+- Caesar source id: `lobehub`
 
 ### Security scanning and `--force`
 
 All hub-installed skills go through a **security scanner** that checks for data exfiltration, prompt injection, destructive commands, supply-chain signals, and other threats.
 
-`hermes skills inspect ...` now also surfaces upstream metadata when available:
+`caesar skills inspect ...` now also surfaces upstream metadata when available:
 - repo URL
 - skills.sh detail page URL
 - install command
@@ -374,7 +374,7 @@ All hub-installed skills go through a **security scanner** that checks for data 
 Use `--force` when you have reviewed a third-party skill and want to override a non-dangerous policy block:
 
 ```bash
-hermes skills install skills-sh/anthropics/skills/pdf --force
+caesar skills install skills-sh/anthropics/skills/pdf --force
 ```
 
 Important behavior:
@@ -386,7 +386,7 @@ Important behavior:
 
 | Level | Source | Policy |
 |-------|--------|--------|
-| `builtin` | Ships with Hermes | Always trusted |
+| `builtin` | Ships with Caesar | Always trusted |
 | `official` | `optional-skills/` in the repo | Builtin trust, no third-party warning |
 | `trusted` | Trusted registries/repos such as `openai/skills`, `anthropics/skills` | More permissive policy than community sources |
 | `community` | Everything else (`skills.sh`, well-known endpoints, custom GitHub repos, most marketplaces) | Non-dangerous findings can be overridden with `--force`; `dangerous` verdicts stay blocked |
@@ -396,9 +396,9 @@ Important behavior:
 The hub now tracks enough provenance to re-check upstream copies of installed skills:
 
 ```bash
-hermes skills check          # Report which installed hub skills changed upstream
-hermes skills update         # Reinstall only the skills with updates available
-hermes skills update react   # Update one specific installed hub skill
+caesar skills check          # Report which installed hub skills changed upstream
+caesar skills update         # Reinstall only the skills with updates available
+caesar skills update react   # Update one specific installed hub skill
 ```
 
 This uses the stored source identifier plus the current upstream bundle content hash to detect drift.

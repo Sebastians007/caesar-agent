@@ -1,6 +1,6 @@
 # Context Compression and Caching
 
-Hermes Agent uses a dual compression system and Anthropic prompt caching to
+Caesar Agent uses a dual compression system and Anthropic prompt caching to
 manage context window usage efficiently across long conversations.
 
 Source files: `agent/context_compressor.py`, `agent/prompt_caching.py`,
@@ -9,7 +9,7 @@ Source files: `agent/context_compressor.py`, `agent/prompt_caching.py`,
 
 ## Dual Compression System
 
-Hermes has two separate compression layers that operate independently:
+Caesar has two separate compression layers that operate independently:
 
 ```
                      ┌──────────────────────────┐
@@ -241,7 +241,7 @@ conversation prefix. Uses Anthropic's `cache_control` breakpoints.
 
 ### Strategy: system_and_3
 
-Anthropic allows a maximum of 4 `cache_control` breakpoints per request. Hermes
+Anthropic allows a maximum of 4 `cache_control` breakpoints per request. Caesar
 uses the "system_and_3" strategy:
 
 ```
