@@ -2,7 +2,49 @@
 
 **The AI agent that conquers your workflow.**
 
-Forked from [Caesar Agent](https://github.com/Sebastians007/caesar-agent) by Nous Research and customized by [Sebastian Sartele](https://github.com/Sebastians007).
+Forked from [Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research and customized by [Sebastian Sartele](https://github.com/Sebastians007).
+
+```mermaid
+flowchart TD
+    subgraph YOU["🧑 You"]
+        CLI["⌨️ Terminal CLI"]
+        MSG["📱 Telegram · Discord\nSlack · WhatsApp · Signal"]
+    end
+
+    subgraph CAESAR["⚔️ Caesar Agent"]
+        direction TB
+        GW["🔀 Gateway\nroutes messages in & out"]
+        LOOP["🧠 Agent Loop\nreasoning · planning · acting"]
+        MEM["💾 Memory\npersists knowledge across sessions"]
+        SKILLS["🎓 Skills Hub\nlearns · creates · improves skills"]
+        TOOLS["🔧 Tools\nbash · browser · files · APIs · code"]
+        CRON["⏰ Cron Scheduler\nautomated recurring tasks"]
+        SUB["⚡ Subagents\nparallel workstreams"]
+    end
+
+    subgraph LLM["🤖 LLM Provider"]
+        ANY["OpenRouter · OpenAI\nAnthropic · Custom endpoint"]
+    end
+
+    subgraph DEPLOY["🚀 Runs On"]
+        RUN["Local · Docker · $5 VPS\nModal · Daytona · Cloud SSH"]
+    end
+
+    CLI -->|send message| GW
+    MSG -->|send message| GW
+    GW --> LOOP
+    CRON -->|trigger task| LOOP
+    LOOP <-->|store & recall| MEM
+    LOOP <-->|use & build| SKILLS
+    LOOP -->|execute| TOOLS
+    LOOP -->|spawn| SUB
+    SUB -->|return results| LOOP
+    LOOP <-->|think| LLM
+    LOOP -->|reply| GW
+    GW -->|response| CLI
+    GW -->|response| MSG
+    CAESAR -.->|deployed on| DEPLOY
+```
 
 Caesar Agent is a self-improving AI agent with a built-in learning loop. It creates skills from experience, improves them during use, persists knowledge across sessions, and builds a deepening model of who you are over time.
 
